@@ -1,0 +1,458 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: probes.pronoea.io
+spec:
+  group: pronoea.io
+  names:
+    kind: Probe
+    listKind: ProbeList
+    plural: probes
+    singular: probe
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: Probe is the Schema for the Probes API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ProbeSpec defines the desired state of Probe
+            properties:
+              labels:
+                additionalProperties:
+                  type: string
+                type: object
+              module:
+                properties:
+                  dns:
+                    properties:
+                      dns_over_tls:
+                        type: boolean
+                      ip_protocol_fallback:
+                        type: boolean
+                      preferred_ip_protocol:
+                        type: string
+                      query_class:
+                        type: string
+                      query_name:
+                        type: string
+                      query_type:
+                        type: string
+                      recursion_desired:
+                        type: boolean
+                      source_ip_address:
+                        type: string
+                      tls_config:
+                        description: TLSConfig configures the options for TLS connections.
+                        properties:
+                          ca_file:
+                            description: The CA cert to use for the targets.
+                            type: string
+                          cert_file:
+                            description: The client cert file for the targets.
+                            type: string
+                          insecure_skip_verify:
+                            description: Disable target certificate validation.
+                            type: boolean
+                          key_file:
+                            description: The client key file for the targets.
+                            type: string
+                          min_version:
+                            description: Minimum TLS version.
+                            type: string
+                          server_name:
+                            description: Used to verify the hostname for the targets.
+                            type: string
+                        type: object
+                      transport_protocol:
+                        type: string
+                      valid_rcodes:
+                        items:
+                          type: string
+                        type: array
+                      validate_additional_rrs:
+                        properties:
+                          fail_if_all_match_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_none_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_not_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      validate_answer_rrs:
+                        properties:
+                          fail_if_all_match_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_none_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_not_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      validate_authority_rrs:
+                        properties:
+                          fail_if_all_match_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_none_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                          fail_if_not_matches_regexp:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                    type: object
+                  grpc:
+                    properties:
+                      ip_protocol_fallback:
+                        type: boolean
+                      preferred_ip_protocol:
+                        type: string
+                      service:
+                        type: string
+                      tls:
+                        type: boolean
+                      tls_config:
+                        description: TLSConfig configures the options for TLS connections.
+                        properties:
+                          ca_file:
+                            description: The CA cert to use for the targets.
+                            type: string
+                          cert_file:
+                            description: The client cert file for the targets.
+                            type: string
+                          insecure_skip_verify:
+                            description: Disable target certificate validation.
+                            type: boolean
+                          key_file:
+                            description: The client key file for the targets.
+                            type: string
+                          min_version:
+                            description: Minimum TLS version.
+                            type: string
+                          server_name:
+                            description: Used to verify the hostname for the targets.
+                            type: string
+                        type: object
+                    type: object
+                  http:
+                    properties:
+                      body:
+                        type: string
+                      body_size_limit:
+                        description: Base2Bytes is the old non-SI power-of-2 byte
+                          scale (1024 bytes in a kilobyte, etc.).
+                        format: int64
+                        type: integer
+                      compression:
+                        type: string
+                      fail_if_body_matches_regexp:
+                        items:
+                          type: string
+                        type: array
+                      fail_if_body_not_matches_regexp:
+                        items:
+                          type: string
+                        type: array
+                      fail_if_header_matches:
+                        items:
+                          properties:
+                            allow_missing:
+                              type: boolean
+                            header:
+                              type: string
+                            regexp:
+                              type: string
+                          type: object
+                        type: array
+                      fail_if_header_not_matches:
+                        items:
+                          properties:
+                            allow_missing:
+                              type: boolean
+                            header:
+                              type: string
+                            regexp:
+                              type: string
+                          type: object
+                        type: array
+                      fail_if_not_ssl:
+                        type: boolean
+                      fail_if_ssl:
+                        type: boolean
+                      headers:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      http_client_config:
+                        properties:
+                          authorization:
+                            description: The HTTP authorization credentials for the
+                              targets.
+                            properties:
+                              credentials:
+                                description: Secret special type for storing secrets.
+                                type: string
+                              credentials_file:
+                                type: string
+                              type:
+                                type: string
+                            type: object
+                          basic_auth:
+                            description: The HTTP basic authentication credentials
+                              for the targets.
+                            properties:
+                              password:
+                                description: Secret special type for storing secrets.
+                                type: string
+                              password_file:
+                                type: string
+                              username:
+                                type: string
+                            required:
+                            - username
+                            type: object
+                          bearer_token:
+                            description: The bearer token for the targets. Deprecated
+                              in favour of Authorization.Credentials.
+                            type: string
+                          bearer_token_file:
+                            description: The bearer token file for the targets. Deprecated
+                              in favour of Authorization.CredentialsFile.
+                            type: string
+                          follow_redirects:
+                            description: FollowRedirects specifies whether the client
+                              should follow HTTP 3xx redirects. The omitempty flag
+                              is not set, because it would be hidden from the marshalled
+                              configuration when set to false.
+                            type: boolean
+                          oauth2:
+                            description: The OAuth2 client credentials used to fetch
+                              a token for the targets.
+                            properties:
+                              client_id:
+                                type: string
+                              client_secret:
+                                type: string
+                              client_secret_file:
+                                type: string
+                              endpoint_params:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                              scopes:
+                                items:
+                                  type: string
+                                type: array
+                              tls_config:
+                                description: TLSConfig is used to connect to the token
+                                  URL.
+                                properties:
+                                  ca_file:
+                                    description: The CA cert to use for the targets.
+                                    type: string
+                                  cert_file:
+                                    description: The client cert file for the targets.
+                                    type: string
+                                  insecure_skip_verify:
+                                    description: Disable target certificate validation.
+                                    type: boolean
+                                  key_file:
+                                    description: The client key file for the targets.
+                                    type: string
+                                  min_version:
+                                    description: Minimum TLS version.
+                                    type: string
+                                  server_name:
+                                    description: Used to verify the hostname for the
+                                      targets.
+                                    type: string
+                                type: object
+                              token_url:
+                                type: string
+                            required:
+                            - client_id
+                            - client_secret
+                            - client_secret_file
+                            - tls_config
+                            - token_url
+                            type: object
+                          proxy_url:
+                            description: HTTP proxy server to use to connect to the
+                              targets.
+                            type: string
+                          tls_config:
+                            description: TLSConfig to use to connect to the targets.
+                            properties:
+                              ca_file:
+                                description: The CA cert to use for the targets.
+                                type: string
+                              cert_file:
+                                description: The client cert file for the targets.
+                                type: string
+                              insecure_skip_verify:
+                                description: Disable target certificate validation.
+                                type: boolean
+                              key_file:
+                                description: The client key file for the targets.
+                                type: string
+                              min_version:
+                                description: Minimum TLS version.
+                                type: string
+                              server_name:
+                                description: Used to verify the hostname for the targets.
+                                type: string
+                            type: object
+                        type: object
+                      ip_protocol_fallback:
+                        type: boolean
+                      method:
+                        type: string
+                      no_follow_redirects:
+                        type: boolean
+                      preferred_ip_protocol:
+                        type: string
+                      skip_resolve_phase_with_proxy:
+                        type: boolean
+                      valid_http_versions:
+                        items:
+                          type: string
+                        type: array
+                      valid_status_codes:
+                        description: Defaults to 2xx.
+                        items:
+                          type: integer
+                        type: array
+                    type: object
+                  icmp:
+                    properties:
+                      dont_fragment:
+                        type: boolean
+                      ip_protocol_fallback:
+                        type: boolean
+                      payload_size:
+                        type: integer
+                      preferred_ip_protocol:
+                        type: string
+                      source_ip_address:
+                        type: string
+                      ttl:
+                        type: integer
+                    type: object
+                  prober:
+                    type: string
+                  tcp:
+                    properties:
+                      ip_protocol_fallback:
+                        type: boolean
+                      preferred_ip_protocol:
+                        type: string
+                      query_response:
+                        items:
+                          properties:
+                            expect:
+                              type: string
+                            send:
+                              type: string
+                            starttls:
+                              type: boolean
+                          type: object
+                        type: array
+                      source_ip_address:
+                        type: string
+                      tls:
+                        type: boolean
+                      tls_config:
+                        description: TLSConfig configures the options for TLS connections.
+                        properties:
+                          ca_file:
+                            description: The CA cert to use for the targets.
+                            type: string
+                          cert_file:
+                            description: The client cert file for the targets.
+                            type: string
+                          insecure_skip_verify:
+                            description: Disable target certificate validation.
+                            type: boolean
+                          key_file:
+                            description: The client key file for the targets.
+                            type: string
+                          min_version:
+                            description: Minimum TLS version.
+                            type: string
+                          server_name:
+                            description: Used to verify the hostname for the targets.
+                            type: string
+                        type: object
+                    type: object
+                  timeout:
+                    description: A Duration represents the elapsed time between two
+                      instants as an int64 nanosecond count. The representation limits
+                      the largest representable duration to approximately 290 years.
+                    format: int64
+                    type: integer
+                required:
+                - prober
+                type: object
+              pause:
+                type: boolean
+              targets:
+                items:
+                  type: string
+                type: array
+            required:
+            - module
+            - pause
+            - targets
+            type: object
+          status:
+            description: ProbeStatus defines the observed state of Probe
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

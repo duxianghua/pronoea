@@ -1,0 +1,13 @@
+database:
+  host: localhost:5432
+  username: username
+  password: password
+  database: database
+email:
+  from: admin@localhost.tech
+  host: localhost
+  port: 587
+  username: username
+  password: password
+  html: '{{ template "email.default.html" . }}'
+  subject: '{{ template "email.default.subject" . }}'

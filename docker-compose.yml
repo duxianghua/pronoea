@@ -1,0 +1,7 @@
+version: "3.7"
+
+services:
+  demo:
+    image: "${DOCKER_IMAGE_NAME}"
+    ports:
+    - "8080:8080"
