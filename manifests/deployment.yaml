@@ -21,9 +21,10 @@ spec:
       labels:
         app: pronoea
     spec:
+      serviceAccount: pronoea
       containers:
       - name: pronoea
-        image: pronoea:0.0.5
+        image: pronoea:latest
         imagePullPolicy: IfNotPresent
         resources:
           requests:

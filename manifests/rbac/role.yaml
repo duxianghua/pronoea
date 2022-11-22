@@ -36,14 +36,19 @@ rules:
   resources:
     - "*"
   verbs:
-    - "*"
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 ---
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: pronoea
-  namespace: default
 ---
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 apiVersion: rbac.authorization.k8s.io/v1
@@ -51,9 +56,8 @@ kind: ClusterRoleBinding
 metadata:
   name: clusterrolebinding
 subjects:
-- kind: User
-  name: name # Name is case sensitive
-  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: pronoea
 roleRef:
   kind: ClusterRole
   name: pronoea-admin

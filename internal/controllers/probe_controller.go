@@ -25,6 +25,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -147,27 +148,36 @@ func (r *ProbeReconciler) createOrUpdateBlackboxConfigmap(ctx context.Context, n
 	configmap := coreV1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
-			Name:      name,
+			Name:      BlackboxConfigMapName,
 		}}
 
-	if err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: BlackboxConfigMapName}, &configmap); err != nil {
+	err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: BlackboxConfigMapName}, &configmap)
+	if errors.IsNotFound(err) {
+		configmap.Data = data
+		err := r.Create(ctx, &configmap, &client.CreateOptions{})
+		if err != nil {
+			log.Debug().Err(err).Msg("Create blackbox configmap fail")
+		}
+		return err
+	} else if err != nil {
+		log.Error().Err(err).Msg("Get blackbox configmap fail")
+		return err
+	} else {
+		configmap.Data = data
+		err = r.Update(ctx, &configmap, &client.UpdateOptions{})
+		if err != nil {
+			log.Error().Err(err).Msg("Update blackbox configmap fail")
+		}
 		return err
 	}
 
-	configmap.Data = data
-
-	if configmap.ManagedFields != nil {
-		return r.Update(ctx, &configmap, &client.UpdateOptions{})
-	} else {
-		return r.Create(ctx, &configmap, &client.CreateOptions{})
-	}
 }
 
 func (r *ProbeReconciler) createBlackbox(ctx context.Context, namespace string) error {
 	podLabels := map[string]string{
-		"asdf": "asf",
+		"app": "blackbox",
 	}
-	matchLabels := client.MatchingLabels{"asdf": "asf"}
+
 	blackboxDeployment := appsV1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
@@ -234,25 +244,25 @@ func (r *ProbeReconciler) createBlackbox(ctx context.Context, namespace string) 
 			},
 		},
 	}
-	blackboxSvcList := coreV1.ServiceList{}
-	if err := r.List(ctx, &blackboxSvcList, client.InNamespace(namespace), matchLabels); err != nil {
+	err := r.Get(ctx, types.NamespacedName{Namespace: namespace, Name: BlackboxDeploymentName}, &appsV1.Deployment{})
+	if errors.IsNotFound(err) {
+		r.Create(ctx, &blackboxDeployment, &client.CreateOptions{})
+	} else if err != nil {
+		log.Error().Err(err).Msg("Get blackbox deployment fail")
 		return err
 	}
-	if len(blackboxSvcList.Items) == 0 {
-		if err := r.Create(ctx, &blackboxSVC, &client.CreateOptions{}); err != nil {
-			return err
+
+	err = r.Get(ctx, types.NamespacedName{Namespace: namespace, Name: BlackboxServiceName}, &coreV1.Service{})
+	if errors.IsNotFound(err) {
+		err = r.Create(ctx, &blackboxSVC)
+		if err != nil {
+			log.Error().Err(err).Msg("Create blackbox SVC fail")
 		}
+	} else if err != nil {
+		log.Error().Err(err).Msg("Get blackbox SVC fail")
+		return err
 	}
-
-	if err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: blackboxDeployment.Name}, &blackboxDeployment); err != nil {
-		return r.Create(ctx, &blackboxDeployment, &client.CreateOptions{})
-	}
-
-	if blackboxDeployment.ManagedFields != nil {
-		return nil
-	} else {
-		return r.Create(ctx, &blackboxDeployment, &client.CreateOptions{})
-	}
+	return nil
 }
 
 func (r *ProbeReconciler) syncPromProbe(ctx context.Context, probe v1.Probe) {
@@ -275,7 +285,7 @@ func (r *ProbeReconciler) syncPromProbe(ctx context.Context, probe v1.Probe) {
 			},
 			ProberSpec: operatorV1.ProberSpec{
 				Scheme: "http",
-				URL:    fmt.Sprintf("%s.%s.svc.cluster.local", BlackboxServiceName, probe.Namespace),
+				URL:    fmt.Sprintf("%s.%s.svc.cluster.local:9115", BlackboxServiceName, probe.Namespace),
 			},
 			Interval:      operatorV1.Duration("1m"),
 			ScrapeTimeout: operatorV1.Duration("30s"),
