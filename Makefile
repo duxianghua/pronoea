@@ -5,8 +5,8 @@ _GIT_LAST_COMMIT_HASH=$(shell git rev-parse --short HEAD)
 _GIT_VERSION=$(_GIT_LAST_COMMIT_TIME).$(_GIT_LAST_COMMIT_HASH)
 
 _VERSION=$(shell cat Version)
-
-DOCKER_IMAGE_PREFIX=
+_VERSION2=""
+DOCKER_IMAGE_PREFIX=xingba/
 DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_PREFIX)pronoea:$(_VERSION)
 
 GOCMD=go
@@ -25,6 +25,7 @@ GOFLAGS = -ldflags "$(GOLDFLAGS)"
 LOCALBIN ?= $(shell pwd)/bin
 $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
+
 
 ## Tool Binaries
 KUSTOMIZE ?= $(LOCALBIN)/kustomize
@@ -62,6 +63,9 @@ local-build: init
 # Docker
 image-build:
 	docker build -t $(DOCKER_IMAGE_NAME) .
+
+image-build-push: image-build
+	docker push $(DOCKER_IMAGE_NAME)
 
 container-run: build
 	DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME) docker-compose up -d
