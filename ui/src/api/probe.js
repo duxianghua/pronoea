@@ -10,7 +10,7 @@ export function getList(params) {
 
 export function CreateProbe(data) {
   return request({
-    url: '/api/v1/probe/default/' + data.metadata.name,
+    url: '/api/v1/probe/' + data.metadata.name,
     method: 'post',
     data
   })
@@ -18,7 +18,7 @@ export function CreateProbe(data) {
 
 export function UpdateProbe(data) {
   return request({
-    url: '/api/v1/probe/default/' + data.metadata.name,
+    url: '/api/v1/probe/' + data.metadata.name,
     method: 'put',
     data
   })
@@ -26,16 +26,18 @@ export function UpdateProbe(data) {
 
 
 
-export function deleteProbe(namespace, name) {
+export function deleteProbe(name, params) {
   return request({
-    url: '/api/v1/probe/' + namespace + "/" + name,
+    url: '/api/v1/probe/' + name,
     method: 'delete',
+    params
   })
 }
 
-export function statusProbe(namespace, name) {
+export function statusProbe(name, params) {
   return request({
-    url: '/api/v1/probe/' + namespace + "/" + name +"/"+"status",
+    url: '/api/v1/probe/' + name + '/status',
     method: 'get',
+    params
   })
 }

@@ -19,8 +19,8 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"reflect"
+	"time"
 
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -116,10 +116,10 @@ func (r *ProbeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		if err != nil {
 			log.Error().Msg(err.Error())
 		}
-		if _, err := http.Get(fmt.Sprintf("http://%s:9115/-/reload", BlackboxServiceName)); err != nil {
-			log.Error().Msg(err.Error())
-		}
-
+		// if _, err := http.Get(fmt.Sprintf("http://%s.%s.svc.cluster.local:9115/-/reload", BlackboxServiceName, probe.ObjectMeta.Namespace)); err != nil {
+		// 	log.Error().Msg(err.Error())
+		// }
+		r.reloadBlackbox(ctx, probe.ObjectMeta.Namespace)
 	}
 	r.cfg = cfg
 	// TODO(user): your logic here
@@ -171,6 +171,25 @@ func (r *ProbeReconciler) createOrUpdateBlackboxConfigmap(ctx context.Context, n
 		return err
 	}
 
+}
+
+func (r *ProbeReconciler) reloadBlackbox(ctx context.Context, namespace string) {
+	deployment := appsV1.Deployment{}
+	err := r.Get(ctx, types.NamespacedName{Namespace: namespace, Name: BlackboxDeploymentName}, &deployment)
+	if err != nil {
+		log.Error().Err(err).Msg("reloadblackbox: get deployment fail")
+		return
+	}
+
+	if len(deployment.Spec.Template.GetAnnotations()) != 0 {
+		deployment.Spec.Template.ObjectMeta.Annotations["pronoea.io/restartedAt"] = time.Now().String()
+	} else {
+		deployment.Spec.Template.ObjectMeta.Annotations = map[string]string{"pronoea.io/restartedAt": time.Now().String()}
+	}
+	err = r.Update(ctx, &deployment)
+	if err != nil {
+		log.Error().Err(err).Msg("reloadblackbox: update deployment fail")
+	}
 }
 
 func (r *ProbeReconciler) createBlackbox(ctx context.Context, namespace string) error {

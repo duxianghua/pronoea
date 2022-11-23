@@ -160,7 +160,8 @@ export default {
     },
     probeStatus(metadata){
       this.centerDialogVisible=true
-      statusProbe(metadata.namespace, metadata.name).then(response => {
+      console.log(metadata)
+      statusProbe(metadata.name, {namespace: metadata.namespace}).then(response => {
         this.statusContext = response
       }).catch(err=>{
         console.log(err)

@@ -11,4 +11,4 @@ resources:
 images:
   - name: pronoea
     newName: xingba/pronoea
-    newTag: 0.0.6
+    newTag: 0.0.7
