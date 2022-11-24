@@ -7,7 +7,7 @@ import { getToken } from '@/utils/auth'
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 30000 // request timeout
 })
 
 // request interceptor
@@ -83,13 +83,13 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error)// for debug
-    console.log(error.response.data.msg) 
+    // console.log('err' + error)// for debug
+    // console.log(error.response.data.msg) 
     Message({
-      // message: error.message,
-      message: error.response.data.msg,
+      message: error.message,
+      //message: error.response.data.msg,
       type: 'error',
-      duration: 5 * 1000
+      duration: 8 * 1000
     })
     return Promise.reject(error)
   }

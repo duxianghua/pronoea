@@ -104,11 +104,22 @@ func (p *ProbeAPI) Update(c *gin.Context) {
 	}
 	probe.ObjectMeta.Namespace = namespace
 	probe.ObjectMeta.Name = name
-	if err := controllers.Probe.Update(c.Request.Context(), &probe, &client.UpdateOptions{}); err != nil {
+	fmt.Printf("versionID1: %s \n", probe.ObjectMeta.ResourceVersion)
+	err = controllers.Probe.Update(c.Request.Context(), &probe, &client.UpdateOptions{})
+	fmt.Printf("versionID2: %s \n", probe.ObjectMeta.ResourceVersion)
+	if errors.IsNotFound(err) {
 		c.Status(404)
 		c.Error(err).SetType(gin.ErrorTypeBind)
 		return
+	} else if err != nil {
+		c.Status(500)
+		c.Error(err).SetType(gin.ErrorTypeBind)
+		return
 	}
+	// controllers.Probe.Get(c.Request.Context(), types.NamespacedName{
+	// 	Namespace: namespace,
+	// 	Name:      name}, &probe)
+	fmt.Printf("versionID3: %s \n", probe.ObjectMeta.ResourceVersion)
 	probe.ObjectMeta.ManagedFields = nil
 	c.JSON(200, probe)
 }

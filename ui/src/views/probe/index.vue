@@ -1,17 +1,19 @@
 <template>
   <div class="app-container">
     <el-row style="margin-bottom: 20px;">
-      <el-button @click="DrawerSwitch">
+      <el-button @click="openFrom({})">
         Add Probe
     </el-button>
     </el-row>
     <!-- Table -->
     <el-table
+      :key="listKey"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
       border
       fit
+      size="nini"
       highlight-current-row
     >
       <el-table-column align="center" label="ID" width="95">
@@ -42,7 +44,7 @@
             v-model="scope.row.spec.pause "
             active-color="#13ce66"
             inactive-color="#ff4949"
-            @change="pauseSwitch(scope.row, scope.$index)">
+            @change="pauseSwitch(scope)">
           </el-switch>
         </template>
       </el-table-column>
@@ -52,16 +54,17 @@
           <span>{{ scope.row.metadata.creationTimestamp }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Aciton" width="200">
+      <el-table-column align="center" prop="created_at" label="Aciton" width="210">
         <template slot-scope="scope">
-          <el-button type="primary" @click="probeStatus(scope.row.metadata)">Check</el-button>
-          <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="delProbe(scope.row.metadata)"></el-button>
+          <el-button type="primary" size="mini" @click="openFrom(scope.row)">Edit</el-button>
+          <el-button type="primary" size="mini" @click="probeStatus(scope.row)">Check</el-button>
+          <el-button type="danger" icon="el-icon-delete"  size="mini" @click="delProbe(scope)"></el-button>
         </template>
         
       </el-table-column>
     </el-table>
     <!-- FORM -->
-    <el-drawer
+    <!-- <el-drawer
       title="Add HTTP Probe"
       :visible.sync="showDrawer"
       v-if="showDrawer"
@@ -74,8 +77,8 @@
       :destroy-on-close="true"
     >
       <probeForm></probeForm>
-    </el-drawer>
-
+    </el-drawer> -->
+    <probeForm :isActive.sync="showDrawer" :formData="formData" :callBack="fetchData"></probeForm>
     <el-dialog
     title="提示"
     :visible.sync="centerDialogVisible"
@@ -85,6 +88,7 @@
       <el-tabs >
           <el-tab-pane  v-for="valuea, key, index in statusContext" :label="key" :key="index" >
           <el-input
+          v-loading="loading"
           type="textarea"
           :rows="18"
           :value=valuea>
@@ -92,10 +96,6 @@
         </el-tab-pane>
       </el-tabs>
     </template>
-      <!-- <el-row v-for="valuea, key, index in statusContext">
-        <span>{{ key }}</span>
-        
-      </el-row> -->
       <span slot="footer" class="dialog-footer">
       <el-button @click="centerDialogVisible = false">取 消</el-button>
       <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
@@ -106,8 +106,8 @@
 
 <script>
 import { getList, deleteProbe, statusProbe, UpdateProbe } from '@/api/probe'
-import { get } from 'js-cookie'
-import probeForm from './from'
+import probeForm from './form'
+import labelFrom from '@/components/labels'
 
 export default {
   filters: {
@@ -122,49 +122,69 @@ export default {
   },
   data() {
     return {
+      formEdit: false,
+      formData: {},
+      showDrawer: false,
       centerDialogVisible: false,
       statusContext: {},
       list: null,
-      listLoading: true
+      listKey: Math.random(),
+      listLoading: true,
+      loading: true
     }
   },
   created() {
     this.fetchData()
   },
   computed:{
-    showDrawer(){
-        return this.$store.state.probe.showDrawer
-    }
+    // showDrawer(){
+    //     return this.$store.state.probe.showDrawer
+    // }
   },
   components:{
-    probeForm
+    probeForm,
+    labelFrom
   },
   methods: {
     fetchData() {
       this.listLoading = true
       getList().then(response => {
-        console.log(response)
         this.list = response.items
         this.listLoading = false
       }).catch(err=>{
         console.log(err)
       })
     },
-    delProbe(metadata){
-      console.log(metadata)
-      deleteProbe(metadata.namespace, metadata.name).then(response => {
-        this.fetchData()
-      }).catch(err=>{
-        console.log(err)
+    delProbe(scope){
+      this.$confirm('Are you sure to delete permanently',{
+        confirmButtonText: "Delete",
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(()=>{
+        deleteProbe(scope.row.metadata.name, {namespace: scope.row.metadata.namespace}).then(response => {
+          this.list.splice(scope.$index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(err=>{
+          console.log(err)
+        })
       })
     },
-    probeStatus(metadata){
+    probeStatus(row){
+      this.statusContext = {}
       this.centerDialogVisible=true
-      console.log(metadata)
-      statusProbe(metadata.name, {namespace: metadata.namespace}).then(response => {
+      this.loading=true
+      row.spec.targets.forEach(element =>{
+        this.statusContext[element] = ""
+      })
+      this.loading=true
+      statusProbe(row.metadata.name, {namespace: row.metadata.namespace}).then(response => {
         this.statusContext = response
+        this.loading=false
       }).catch(err=>{
-        console.log(err)
+        this.loading=false
       })
     },
     DrawerSwitch() {
@@ -174,14 +194,18 @@ export default {
       this.DrawerSwitch()
       this.fetchData()
     },
-    pauseSwitch(obj, index){
-      UpdateProbe(obj).then(response=>{
-        console.log(index)
-        console.log(response)
-        this.list[index] = response
+    pauseSwitch(scope){
+      UpdateProbe(scope.row).then(response=>{
+        this.$set(this.list, scope.$index, response)
       }).catch(err=>{
         this.$message(err.$message)
       })
+    },
+    openFrom(data){
+      // this.formItems = this.contactGroupItem
+      this.formData = data
+      this.showDrawer = true
+      // this.formEdit = false
     }
   }
 }
