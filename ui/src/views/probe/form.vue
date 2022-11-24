@@ -16,10 +16,10 @@
         <el-form-item label="Name" prop="metadata.name">
           <el-input v-model="form.metadata.name" />
         </el-form-item>
-        <el-form-item label="Labels">
+        <!-- <el-form-item label="Labels">
           <labelFrom :data="tempLabels">
           </labelFrom>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="Targets" style="margin-top: 15px;">
             <el-container>
               <el-aside width="130px">
@@ -95,6 +95,17 @@
               </el-collapse-item>
             </el-collapse>
         </el-form-item>
+        <el-form-item label="ContactGroup" prop="spec.contact">
+          <el-select v-model="form.spec.contact" filterable placeholder="Please select">
+          <el-option
+            v-for="item in contactOptions"
+            :key="item"
+            :label="item"
+            :value="item">
+          </el-option>
+        </el-select>
+      </el-form-item>
+        
         <el-form-item>
           <el-button type="primary" @click="onSubmit" v-if="isEdit">Update</el-button>
           <el-button type="primary" @click="onSubmit" v-if="!isEdit">Create</el-button>
@@ -108,7 +119,8 @@
 
 
 <script>
-import { CreateProbe } from '@/api/probe'
+import { CreateProbe, UpdateProbe } from '@/api/probe'
+import { ListContactGroup } from '@/api/ContactGroup'
 import labelFrom from '@/components/labels'
 
 export default {
@@ -144,6 +156,7 @@ export default {
     return {
       showDrawer: this.isActive,
       isEdit: false,
+      contactOptions: [],
       tempLabels:[{key:"project",value:""}],
       headers: {},
       hosts: "",
@@ -159,6 +172,9 @@ export default {
         'targets': [
           {required: true, message: "please enter url", trigger: ["blur", "change"]},
           {validator: checkURL, trigger: ["blur", "change"]}
+        ],
+        'spec.contact': [
+          {required: true, message: "please select contact group", trigger: ["blur", "change"]},
         ]
       },
       data: {
@@ -166,13 +182,11 @@ export default {
         "apiVersion": "syncbug.io/v1",
         "metadata": {
             "name": "",
-            "labels": {}
+            "labels": {"project": ""}
         },
       "spec": {
         "targets": [""],
-        "labels": {
-            "project": "baidu"
-        },
+        "contact": "",
         "module": {
             "prober": "http",
             "http": {
@@ -200,10 +214,20 @@ export default {
         }
       },
       },
-      form: {}
+      form: {},
+      options: [
+      {
+          value: 'devops',
+          label: 'devops'
+        }, {
+          value: 'sso',
+          label: 'sso'
+        }, {
+          value: 'cmt',
+          label: 'cmt'
+        }
+      ]
     }
-  },
-  computed:{
   },
   watch: {
     isActive: {
@@ -215,18 +239,6 @@ export default {
       handler(){
         this.$emit("update:isActive", this.showDrawer)
       }
-    },
-    tempLabels: {
-      handler(val){
-      var _tempData = {}
-      this.tempLabels.map(function(item){
-          if (item.key.length > 2 && item.value.length > 2 ) {
-            _tempData[item.key] = item.value
-          }
-        })
-        this.form.metadata.labels = _tempData
-     },
-     deep: true
     },
     form: {
         handler(){
@@ -241,6 +253,10 @@ export default {
           this.form = this.data
         }else{
           this.form = JSON.parse(JSON.stringify(obj))
+          console.log(typeof obj.metadata.labels)
+          if ( "project" in this.form.metadata.labels){
+            this.form.spec.contact = obj.metadata.labels["project"]
+          }
           this.isEdit = true
         }
       },
@@ -249,11 +265,20 @@ export default {
   },
   created() {
     this.defaultSelect()
+    this.initContactGroups()
   },
   components:{
     labelFrom
   },
   methods: {
+    initContactGroups(){
+      ListContactGroup().then(res=>{
+        res.items.forEach(item =>{
+          this.contactOptions.push(item.metadata.name)
+        })
+      })
+      //console.log(this.contactOptions)
+    },
     defaultSelect(){
       this.target_inpout_edit = this.form.spec.targets.length -1
     },
@@ -271,12 +296,23 @@ export default {
     onSubmit() {
       this.$refs['from'].validate((valid) => {
         if (valid){
-          CreateProbe(this.form).then(response => {
-            this.onCancel()
-            this.callBack()
-          }).catch(err=>{
-            console.log(err)
-          })
+          this.form.metadata.labels["project"] = this.form.spec.contact
+          if (this.isEdit){
+            UpdateProbe(this.form).then(response => {
+              this.onCancel()
+              this.callBack()
+            }).catch(err=>{
+              console.log(err)
+            })
+          }else{
+            console.log(this.form)
+            CreateProbe(this.form).then(response => {
+              this.onCancel()
+              this.callBack()
+            }).catch(err=>{
+              console.log(err)
+            })
+          }
         }
       })
     },

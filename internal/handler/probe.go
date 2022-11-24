@@ -91,10 +91,10 @@ func (p *ProbeAPI) Delete(c *gin.Context) {
 
 func (p *ProbeAPI) Update(c *gin.Context) {
 	name := c.Param("name")
-	namespace, ok := c.GetQuery("namespace")
-	if !ok {
-		namespace = utils.GetCurrentNamespace()
-	}
+	// namespace, ok := c.GetQuery("namespace")
+	// if !ok {
+	// 	namespace = utils.GetCurrentNamespace()
+	// }
 	probe := v1.Probe{}
 	err := c.ShouldBindJSON(&probe)
 	if err != nil {
@@ -102,7 +102,7 @@ func (p *ProbeAPI) Update(c *gin.Context) {
 		c.Error(err).SetType(gin.ErrorTypeBind)
 		return
 	}
-	probe.ObjectMeta.Namespace = namespace
+	// probe.ObjectMeta.Namespace = namespace
 	probe.ObjectMeta.Name = name
 	fmt.Printf("versionID1: %s \n", probe.ObjectMeta.ResourceVersion)
 	err = controllers.Probe.Update(c.Request.Context(), &probe, &client.UpdateOptions{})
