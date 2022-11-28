@@ -12,6 +12,7 @@ func Register(r *gin.Engine) {
 	r.Static("/dashboard", "./html/")
 	r.Static("/favicon.ico", "./html/")
 	r.Static("/static", "./html/static")
+	r.GET("/", handler.RedirectHomeHandler)
 	// r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	// health apis

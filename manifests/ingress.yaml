@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+    cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+  name: pronoea-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host:  pronoea.127.0.0.1.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pronoea
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - pronoea.127.0.0.1.nip.io
+    secretName: pronoea-cert

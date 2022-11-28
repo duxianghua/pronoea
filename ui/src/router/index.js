@@ -31,11 +31,11 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 export const constantRoutes = [
-  {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true
-  },
+  // {
+  //   path: '/login',
+  //   component: () => import('@/views/login/index'),
+  //   hidden: true
+  // },
 
   {
     path: '/404',
@@ -43,36 +43,41 @@ export const constantRoutes = [
     hidden: true
   },
 
-  {
+  // {
+  //   path: '/',
+  //   component: Layout,
+  //   redirect: '/dashboard',
+  //   children: [{
+  //     path: 'dashboard',
+  //     name: 'Dashboard',
+  //     component: () => import('@/views/dashboard/index'),
+  //     meta: { title: 'Dashboard', icon: 'dashboard' }
+  //   }]
+  // },
+   {
     path: '/',
     component: Layout,
-    redirect: '/probe',
-    // children: [{
-    //   path: 'dashboard',
-    //   name: 'Dashboard',
-    //   component: () => import('@/views/dashboard/index'),
-    //   meta: { title: 'Dashboard', icon: 'dashboard' }
-    // }]
+    redirect: '/probe/http'
   },
 
   {
     path: '/probe',
     component: Layout,
-    redirect: '/probe/probe',
-    name: 'Probe',
+    //redirect: '/http',
+    // name: 'Probe',
     meta: { title: 'Probe', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'probe',
-        name: 'probe',
+        path: 'http',
+        name: 'http',
         component: () => import('@/views/probe/index'),
-        meta: { title: 'probe', icon: 'table' }
+        meta: { title: 'HTTPProbe', icon: 'table' }
       },
       // {
       //   path: 'table',
       //   name: 'Table',
       //   component: () => import('@/views/table/index'),
-      //   meta: { title: 'Table', icon: 'table' }
+      //   meta: { title: 'K6', icon: 'table' }
       // },
       // {
       //   path: 'tree',

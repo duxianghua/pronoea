@@ -77,6 +77,10 @@ func ErrorHandler(c *gin.Context) {
 
 }
 
+func RedirectHomeHandler(c *gin.Context) {
+	c.Redirect(302, "/dashboard")
+}
+
 func Recover(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
