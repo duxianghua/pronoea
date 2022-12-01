@@ -100,6 +100,8 @@ func (r *ProbeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		modules[probe.ObjectMeta.Name] = probe.Spec.Module
 	}
 	cfg := Config{Modules: modules}
+	cfg.Modules["http_2xx"] = v1.Module{Prober: "http"}
+	cfg.Modules["tcp_connect"] = v1.Module{Prober: "tcp", Timeout: time.Second * 5}
 	// 如果cfg没有改变则退出
 	if !reflect.DeepEqual(cfg, r.cfg) {
 		yamlByte, err := yaml.Marshal(cfg)

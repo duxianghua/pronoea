@@ -140,6 +140,7 @@ export default {
     },
     formData: {
       handler: function(val, oldval){
+        console.log(val)
         this.contactGroupItem = JSON.parse(JSON.stringify(val))
       },
       immediate: true
@@ -170,8 +171,9 @@ export default {
       this.contactGroupItem = this.data
     },
     delItem(data, index){
+      console.log(data)
       if ( data.length > 1 ){
-        delete data[index]
+        data.splice(index, 1)
       }
     },
     addItem(data){
