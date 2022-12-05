@@ -16,10 +16,12 @@
         <el-form-item label="Name" prop="metadata.name">
           <el-input v-model="form.metadata.name" />
         </el-form-item>
-        <!-- <el-form-item label="Labels">
-          <labelFrom :data="tempLabels">
-          </labelFrom>
-        </el-form-item> -->
+        <el-form-item label="Labels">
+          <!-- <labelFrom :data="labels">
+          </labelFrom> -->
+          <Labels v-model="form.metadata.labels">
+          </Labels>
+        </el-form-item>
         <el-form-item label="Targets" style="margin-top: 15px;">
             <el-container>
               <el-aside width="130px">
@@ -122,6 +124,7 @@
 import { CreateProbe, UpdateProbe } from '@/api/probe'
 import { ListContactGroup } from '@/api/ContactGroup'
 import labelFrom from '@/components/labels'
+import Labels from '@/components/labels/labels'
 
 export default {
   name: "probeForm",
@@ -157,7 +160,7 @@ export default {
       showDrawer: this.isActive,
       isEdit: false,
       contactOptions: [],
-      tempLabels:[{key:"project",value:""}],
+      tempLabels:[{key:"",value:""}],
       headers: {},
       hosts: "",
       target_inpout_edit: -1,
@@ -229,6 +232,25 @@ export default {
       ]
     }
   },
+  computed:{
+    labels: {
+      get(){
+        var _labels=[]
+        // console.log(this.form.metadata.labels)
+        for (var key in this.form.metadata.labels){
+          // console.log(key, this.form.metadata.labels[key])
+          _labels.push({key: key, value: this.form.metadata.labels[key]})
+        }
+        // console.log(_labels)
+        return _labels
+      },
+      set(val){
+        console.log("set")
+        console.log(val["value"])
+        this.form.metadata.labels[val[key]]=val[value]
+      }
+    }
+  },
   watch: {
     isActive: {
       handler: function(val, oldval){
@@ -268,7 +290,8 @@ export default {
     this.initContactGroups()
   },
   components:{
-    labelFrom
+    labelFrom,
+    Labels
   },
   methods: {
     initContactGroups(){
@@ -277,7 +300,6 @@ export default {
           this.contactOptions.push(item.metadata.name)
         })
       })
-      //console.log(this.contactOptions)
     },
     defaultSelect(){
       this.target_inpout_edit = this.form.spec.targets.length -1
