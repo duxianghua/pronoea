@@ -180,6 +180,39 @@ spec:
                     type: object
                   http:
                     properties:
+                      authorization:
+                        description: The HTTP authorization credentials for the targets.
+                        properties:
+                          credentials:
+                            description: Secret special type for storing secrets.
+                            type: string
+                          credentials_file:
+                            type: string
+                          type:
+                            type: string
+                        type: object
+                      basic_auth:
+                        description: The HTTP basic authentication credentials for
+                          the targets.
+                        properties:
+                          password:
+                            description: Secret special type for storing secrets.
+                            type: string
+                          password_file:
+                            type: string
+                          username:
+                            type: string
+                        required:
+                        - username
+                        type: object
+                      bearer_token:
+                        description: The bearer token for the targets. Deprecated
+                          in favour of Authorization.Credentials.
+                        type: string
+                      bearer_token_file:
+                        description: The bearer token file for the targets. Deprecated
+                          in favour of Authorization.CredentialsFile.
+                        type: string
                       body:
                         type: string
                       body_size_limit:
@@ -223,109 +256,43 @@ spec:
                         type: boolean
                       fail_if_ssl:
                         type: boolean
+                      follow_redirects:
+                        description: FollowRedirects specifies whether the client
+                          should follow HTTP 3xx redirects. The omitempty flag is
+                          not set, because it would be hidden from the marshalled
+                          configuration when set to false.
+                        type: boolean
                       headers:
                         additionalProperties:
                           type: string
                         type: object
-                      http_client_config:
+                      ip_protocol_fallback:
+                        type: boolean
+                      method:
+                        type: string
+                      no_follow_redirects:
+                        type: boolean
+                      oauth2:
+                        description: The OAuth2 client credentials used to fetch a
+                          token for the targets.
                         properties:
-                          authorization:
-                            description: The HTTP authorization credentials for the
-                              targets.
-                            properties:
-                              credentials:
-                                description: Secret special type for storing secrets.
-                                type: string
-                              credentials_file:
-                                type: string
-                              type:
-                                type: string
-                            type: object
-                          basic_auth:
-                            description: The HTTP basic authentication credentials
-                              for the targets.
-                            properties:
-                              password:
-                                description: Secret special type for storing secrets.
-                                type: string
-                              password_file:
-                                type: string
-                              username:
-                                type: string
-                            required:
-                            - username
-                            type: object
-                          bearer_token:
-                            description: The bearer token for the targets. Deprecated
-                              in favour of Authorization.Credentials.
+                          client_id:
                             type: string
-                          bearer_token_file:
-                            description: The bearer token file for the targets. Deprecated
-                              in favour of Authorization.CredentialsFile.
+                          client_secret:
                             type: string
-                          follow_redirects:
-                            description: FollowRedirects specifies whether the client
-                              should follow HTTP 3xx redirects. The omitempty flag
-                              is not set, because it would be hidden from the marshalled
-                              configuration when set to false.
-                            type: boolean
-                          oauth2:
-                            description: The OAuth2 client credentials used to fetch
-                              a token for the targets.
-                            properties:
-                              client_id:
-                                type: string
-                              client_secret:
-                                type: string
-                              client_secret_file:
-                                type: string
-                              endpoint_params:
-                                additionalProperties:
-                                  type: string
-                                type: object
-                              scopes:
-                                items:
-                                  type: string
-                                type: array
-                              tls_config:
-                                description: TLSConfig is used to connect to the token
-                                  URL.
-                                properties:
-                                  ca_file:
-                                    description: The CA cert to use for the targets.
-                                    type: string
-                                  cert_file:
-                                    description: The client cert file for the targets.
-                                    type: string
-                                  insecure_skip_verify:
-                                    description: Disable target certificate validation.
-                                    type: boolean
-                                  key_file:
-                                    description: The client key file for the targets.
-                                    type: string
-                                  min_version:
-                                    description: Minimum TLS version.
-                                    type: string
-                                  server_name:
-                                    description: Used to verify the hostname for the
-                                      targets.
-                                    type: string
-                                type: object
-                              token_url:
-                                type: string
-                            required:
-                            - client_id
-                            - client_secret
-                            - client_secret_file
-                            - tls_config
-                            - token_url
+                          client_secret_file:
+                            type: string
+                          endpoint_params:
+                            additionalProperties:
+                              type: string
                             type: object
-                          proxy_url:
-                            description: HTTP proxy server to use to connect to the
-                              targets.
-                            type: string
+                          scopes:
+                            items:
+                              type: string
+                            type: array
                           tls_config:
-                            description: TLSConfig to use to connect to the targets.
+                            description: TLSConfig is used to connect to the token
+                              URL.
                             properties:
                               ca_file:
                                 description: The CA cert to use for the targets.
@@ -346,17 +313,44 @@ spec:
                                 description: Used to verify the hostname for the targets.
                                 type: string
                             type: object
+                          token_url:
+                            type: string
+                        required:
+                        - client_id
+                        - client_secret
+                        - client_secret_file
+                        - tls_config
+                        - token_url
                         type: object
-                      ip_protocol_fallback:
-                        type: boolean
-                      method:
-                        type: string
-                      no_follow_redirects:
-                        type: boolean
                       preferred_ip_protocol:
+                        type: string
+                      proxy_url:
+                        description: HTTP proxy server to use to connect to the targets.
                         type: string
                       skip_resolve_phase_with_proxy:
                         type: boolean
+                      tls_config:
+                        description: TLSConfig to use to connect to the targets.
+                        properties:
+                          ca_file:
+                            description: The CA cert to use for the targets.
+                            type: string
+                          cert_file:
+                            description: The client cert file for the targets.
+                            type: string
+                          insecure_skip_verify:
+                            description: Disable target certificate validation.
+                            type: boolean
+                          key_file:
+                            description: The client key file for the targets.
+                            type: string
+                          min_version:
+                            description: Minimum TLS version.
+                            type: string
+                          server_name:
+                            description: Used to verify the hostname for the targets.
+                            type: string
+                        type: object
                       valid_http_versions:
                         items:
                           type: string

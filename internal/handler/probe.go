@@ -40,6 +40,7 @@ func (p *ProbeAPI) Get(c *gin.Context) {
 		c.Error(err).SetType(gin.ErrorTypeBind)
 		return
 	}
+
 	probe.ObjectMeta.ManagedFields = nil
 	c.JSON(200, probe)
 }
@@ -140,7 +141,7 @@ func (p *ProbeAPI) Status(c *gin.Context) {
 	}
 	data := gin.H{}
 	for _, host := range probe.Spec.Targets {
-		url := fmt.Sprintf("http://%s.%s.svc.cluster.local:9115/probe?target=%s&module=%s", controllers.BlackboxServiceName, namespace, host, probe.ObjectMeta.Name)
+		url := fmt.Sprintf("http://%s.%s.svc.cluster.local:9115/probe?target=%s&module=%s&debug=true", controllers.BlackboxServiceName, namespace, host, probe.ObjectMeta.Name)
 		//url := fmt.Sprintf("http://localhost:59906/probe?target=%s&module=%s", host, probe.ObjectMeta.Name)
 		response, err := http.Get(url)
 		if err != nil {

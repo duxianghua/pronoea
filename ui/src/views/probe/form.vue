@@ -24,30 +24,13 @@
         </el-form-item>
         <el-form-item label="Targets" style="margin-top: 15px;">
             <el-container>
-              <el-aside width="130px">
+              <el-aside width="100px">
                 <el-select v-model="form.spec.module.http.method">
                   <el-option label="GET" value="GET"></el-option>
                   <el-option label="POST" value="POST"></el-option>
                 </el-select>
             </el-aside>
-            <!-- <el-main style="padding: 0 0 0 15px;">
-              <div style="margin: 0 0 0 0;" v-for="(item,index) in form.spec.targets" :key="index">
-                <el-form-item :prop="'spec.targets.'+index" :rules="formRules.targets">
-                  <el-row >
-                    <el-input
-                      placeholder="URL: https://www.google.com/login"
-                      v-model="form.spec.targets[index]"
-                      class="input-with-select" 
-                      style="margin-bottom: 10px;"
-                      @keyup.enter.native="addHost(index)"
-                      :disabled="target_inpout_edit==index?false:true"
-                    >
-                      <i slot="suffix" class="el-icon-delete-solid" @click="delTarget(index)"></i>
-                    </el-input>
-                  </el-row>
-                  </el-form-item>
-              </div>
-            </el-main> -->
+            
             <div style="padding: 0 0 0 15px; width: 100%;">
               <div style="margin: 0 0 0 0;" v-for="(item,index) in form.spec.targets" :key="index">
                 <el-form-item :prop="'spec.targets.'+index" :rules="formRules.targets">
@@ -66,8 +49,20 @@
                   </el-form-item>
               </div>
             </div>
+            
             </el-container>
-            <el-collapse style="margin-top: 50px;">
+            <el-row>
+            
+            <el-input
+                v-if="form.spec.module.http.method === 'POST'"
+                type="textarea"
+                :autosize="{ minRows: 3, maxRows: 4}"
+                placeholder="Request Body"
+                v-model="form.spec.module.http.body">
+            </el-input>
+          
+            </el-row>
+            <el-collapse style="margin-top: 10px;">
               <el-collapse-item title="Advanced Setting" name="1" style="margin-top: 10px;">
                 <el-form label-width="240px">
                   <el-form-item label="headers">
@@ -93,9 +88,18 @@
                   <el-form-item label="NoFollowRedirects">
                     <el-switch v-model="form.spec.module.http.no_follow_redirects" />
                   </el-form-item>
+                  <el-form-item label="insecure_skip_verify">
+                    <el-switch v-model="form.spec.module.http.tls_config.insecure_skip_verify" />
+                  </el-form-item>
                 </el-form>
               </el-collapse-item>
             </el-collapse>
+        </el-form-item>
+        <el-form-item label="Timeout">
+          <el-input 
+            placeholder="10s,30s,100s"
+            v-model="form.spec.module.timeout">
+          </el-input>
         </el-form-item>
         <el-form-item label="ContactGroup" prop="spec.contact">
           <el-select v-model="form.spec.contact" filterable placeholder="Please select">
@@ -192,6 +196,7 @@ export default {
         "contact": "",
         "module": {
             "prober": "http",
+            "timeout": "10s",
             "http": {
                 "valid_status_codes": [],
                 "valid_http_versions": null,
@@ -208,9 +213,12 @@ export default {
                 "fail_if_header_matches": null,
                 "fail_if_header_not_matches": null,
                 "body": "",
-                "http_client_config": {
-                    "tls_config": {}
+                "tls_config": {
+                  "insecure_skip_verify": "false"
                 },
+                "oauth2": {},
+                "basic_auth":{},
+                "bearer_token": "",
                 "compression": "",
                 "body_size_limit": "0B"
             }
@@ -222,12 +230,6 @@ export default {
       {
           value: 'devops',
           label: 'devops'
-        }, {
-          value: 'sso',
-          label: 'sso'
-        }, {
-          value: 'cmt',
-          label: 'cmt'
         }
       ]
     }
@@ -274,8 +276,10 @@ export default {
           this.isEdit = false
           this.form = this.data
         }else{
-          this.form = JSON.parse(JSON.stringify(obj))
-          console.log(typeof obj.metadata.labels)
+          console.log("data", this.data)
+          console.log("obj", obj)
+          this.form = {...this.data, ...JSON.parse(JSON.stringify(obj))}
+          console.log(this.form)
           if ( "project" in this.form.metadata.labels){
             this.form.spec.contact = obj.metadata.labels["project"]
           }

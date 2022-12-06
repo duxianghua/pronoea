@@ -34,18 +34,18 @@ type HTTPProbe struct {
 	FailIfHeaderMatchesRegexp    []HeaderMatch     `json:"fail_if_header_matches,omitempty" yaml:"fail_if_header_matches,omitempty"`
 	FailIfHeaderNotMatchesRegexp []HeaderMatch     `json:"fail_if_header_not_matches,omitempty" yaml:"fail_if_header_not_matches,omitempty"`
 	Body                         string            `json:"body,omitempty" yaml:"body,omitempty"`
-	HTTPClientConfig             HTTPClientConfig  `json:"http_client_config,omitempty" yaml:"http_client_config,omitempty"`
-	Compression                  string            `json:"compression,omitempty" yaml:"compression,omitempty"`
-	BodySizeLimit                units.Base2Bytes  `json:"body_size_limit,omitempty" yaml:"body_size_limit,omitempty"`
+	HTTPClientConfig             `json:",inline" yaml:",inline"`
+	Compression                  string           `json:"compression,omitempty" yaml:"compression,omitempty"`
+	BodySizeLimit                units.Base2Bytes `json:"body_size_limit,omitempty" yaml:"body_size_limit,omitempty"`
 }
 
 type HTTPClientConfig struct {
 	// The HTTP basic authentication credentials for the targets.
-	BasicAuth *config.BasicAuth `yaml:"basic_auth,omitempty" json:"basic_auth,omitempty"`
+	BasicAuth config.BasicAuth `yaml:"basic_auth,omitempty" json:"basic_auth,omitempty"`
 	// The HTTP authorization credentials for the targets.
-	Authorization *config.Authorization `yaml:"authorization,omitempty" json:"authorization,omitempty"`
+	Authorization config.Authorization `yaml:"authorization,omitempty" json:"authorization,omitempty"`
 	// The OAuth2 client credentials used to fetch a token for the targets.
-	OAuth2 *OAuth2 `yaml:"oauth2,omitempty" json:"oauth2,omitempty"`
+	OAuth2 OAuth2 `yaml:"oauth2,omitempty" json:"oauth2,omitempty"`
 	// The bearer token for the targets. Deprecated in favour of
 	// Authorization.Credentials.
 	BearerToken config.Secret `yaml:"bearer_token,omitempty" json:"bearer_token,omitempty"`
