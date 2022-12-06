@@ -1,10 +1,23 @@
 <template>
   <div class="app-container">
-    <el-row style="margin-bottom: 20px;">
-      <el-button @click="openFrom({})">
-        Add Probe
-    </el-button>
+    <div style="margin-bottom: 5px; box-shadow: 0px 0px 10px #dedede; height: 60px; padding:10px" >
+    
+    <el-row :gutter="20">
+      <el-col :span="8">
+        <el-input
+        placeholder="Search"
+        prefix-icon="el-icon-search"></el-input>
+      </el-col>
+      <el-col :span="8"><div class="grid-content bg-purple"></div></el-col>
+      <el-col :span="8" style="float:right">
+        <el-button type="primary" @click="openFrom({})" style="float:right">
+          Add Probe
+        </el-button>
+      </el-col>
+      
+    
     </el-row>
+  </div>
     <!-- Table -->
     <el-table
       :key="listKey"
@@ -15,6 +28,7 @@
       fit
       size="nini"
       highlight-current-row
+      style="min-height: 540px; box-shadow: 0px 0px 10px #dedede;" >
     >
       <el-table-column align="center" label="ID" width="95">
         <template slot-scope="scope">
@@ -28,9 +42,9 @@
       </el-table-column>
       <el-table-column label="Targets" align="center">
         <template slot-scope="scope">
-          <p v-for="v in scope.row.spec.targets">
-            {{ v }}
-          </p>
+          <div v-for="v in scope.row.spec.targets">
+            <el-link type="primary" :href="v" target="_blank">{{ v }}</el-link>
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="ProbeType" width="110" align="center">
@@ -63,24 +77,9 @@
         
       </el-table-column>
     </el-table>
-    <!-- FORM -->
-    <!-- <el-drawer
-      title="Add HTTP Probe"
-      :visible.sync="showDrawer"
-      v-if="showDrawer"
-      direction="rtl"
-      :modal="true"
-      :show-close="true"
-      :wrapperClosable="false"
-      size="60%"
-      :before-close="closeHander"
-      :destroy-on-close="true"
-    >
-      <probeForm></probeForm>
-    </el-drawer> -->
     <probeForm :isActive.sync="showDrawer" :formData="formData" :callBack="fetchData"></probeForm>
     <el-dialog
-    title="提示"
+    title=""
     :visible.sync="centerDialogVisible"
     width="80%"
     center>
@@ -96,10 +95,10 @@
         </el-tab-pane>
       </el-tabs>
     </template>
-      <span slot="footer" class="dialog-footer">
-      <el-button @click="centerDialogVisible = false">取 消</el-button>
+    <!-- <span slot="footer" class="dialog-footer">
+      <el-button @click="centerDialogVisible = false">Close</el-button>
       <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
-    </span>
+    </span> -->
   </el-dialog>
   </div>
 </template>
