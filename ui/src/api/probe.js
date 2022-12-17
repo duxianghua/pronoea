@@ -24,8 +24,6 @@ export function UpdateProbe(data) {
   })
 }
 
-
-
 export function deleteProbe(name, params) {
   return request({
     url: '/api/v1/probe/' + name,

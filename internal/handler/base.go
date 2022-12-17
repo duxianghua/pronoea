@@ -54,7 +54,7 @@ func getResult(code string, msg string, data interface{}) Result {
 // 	return result
 // }
 
-func error(c *gin.Context, errcode string, msg string, data interface{}) {
+func commonError(c *gin.Context, errcode string, msg string, data interface{}) {
 	c.JSON(http.StatusInternalServerError, getResult(errcode, msg, data))
 }
 
@@ -88,7 +88,7 @@ func Recover(c *gin.Context) {
 			log.Error().Interface("error", err)
 			debug.PrintStack()
 			//封装通用json返回
-			error(c, "-1", "call api error!", err)
+			commonError(c, "-1", "call api error!", err)
 			//终止后续接口调用，不加的话recover到异常后，还会继续执行接口里后续代码
 			c.Abort()
 		}

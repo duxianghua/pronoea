@@ -54,7 +54,7 @@ export const constantRoutes = [
   //     meta: { title: 'Dashboard', icon: 'dashboard' }
   //   }]
   // },
-   {
+  {
     path: '/',
     component: Layout,
     redirect: '/probe/http'
@@ -63,8 +63,6 @@ export const constantRoutes = [
   {
     path: '/probe',
     component: Layout,
-    //redirect: '/http',
-    // name: 'Probe',
     meta: { title: 'Probe', icon: 'el-icon-s-help' },
     children: [
       {
@@ -73,21 +71,35 @@ export const constantRoutes = [
         component: () => import('@/views/probe/index'),
         meta: { title: 'HTTPProbe', icon: 'table' }
       },
-      // {
-      //   path: 'table',
-      //   name: 'Table',
-      //   component: () => import('@/views/table/index'),
-      //   meta: { title: 'K6', icon: 'table' }
-      // },
-      // {
-      //   path: 'tree',
-      //   name: 'Tree',
-      //   component: () => import('@/views/tree/index'),
-      //   meta: { title: 'Tree', icon: 'tree' }
-      // }
     ]
   },
-
+  {
+    path: '/scenarios',
+    component: Layout,
+    redirect: "/scenarios",
+    meta: { title: 'Scenarios', icon: 'el-icon-s-help' },
+    children: [
+        {
+          path: '',
+          name: 'list',
+          hidden: true,
+          component: () => import('@/views/scenarios/list'),
+          meta: { title: 'list'},
+        },
+        {
+          path: 'editor/:namespace/:name',
+          hidden: true,
+          component: () => import('@/views/scenarios/editor'),
+          meta: { title: 'Scenarios Detail'},
+        },
+        {
+          path: 'editor',
+          hidden: true,
+          component: () => import('@/views/scenarios/editor'),
+          meta: { title: 'Create Scenarios'},
+        }
+    ]
+  },
   {
     path: '/contact',
     component: Layout,
@@ -177,7 +189,7 @@ export const constantRoutes = [
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })

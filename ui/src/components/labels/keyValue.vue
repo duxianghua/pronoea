@@ -1,27 +1,27 @@
 <template>
-  <el-form-item> 
-        <el-col :span="5">
-          <el-input v-model="data.key"/>
-        </el-col>
-        <el-col :span="2" class="line">-</el-col>
-        <el-col :span="5">
-          <el-input v-model="data.value"/>
-        </el-col>
-        <el-col :span="2" class="line">-</el-col>
-        <el-col :span="5">
-          asdfs
-        </el-col>
-</el-form-item>
+  <el-form-item>
+    <el-col :span="5">
+      <el-input v-model="data.key" />
+    </el-col>
+    <el-col :span="2" class="line">-</el-col>
+    <el-col :span="5">
+      <el-input v-model="data.value" />
+    </el-col>
+    <el-col :span="2" class="line">-</el-col>
+    <el-col :span="5">
+      asdfs
+    </el-col>
+  </el-form-item>
 </template>
 
 <script>
 
 export default {
-  name: 'keyValue',
+  name: 'KeyValue',
   props: {
-      data: {
-        type: Object,
-        required: false
+    data: {
+      type: Object,
+      required: false
     }
   }
 }

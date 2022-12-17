@@ -333,7 +333,6 @@ func (r *ProbeReconciler) syncPromProbe(ctx context.Context, probe v1.Probe) {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to Update the probe status")
 	}
-
 }
 
 func (r *ProbeReconciler) delPromProbe(ctx context.Context, namespace string, name string) {

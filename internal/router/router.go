@@ -58,6 +58,7 @@ func route_v1(rg *gin.RouterGroup) {
 	probeApi(rg)
 	contactGroupApi(rg)
 	alertsApi(rg)
+	ScenariosAPI(rg)
 }
 
 func route_v2(rg *gin.RouterGroup) {

@@ -48,7 +48,7 @@ service.interceptors.response.use(
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 20000 && response.status !== 200) {
       console.log(response.status)
-      if (res.code == "-1"){
+      if (res.code === '-1') {
         Message({
           message: res.msg,
           type: 'error',
@@ -61,8 +61,6 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
-
-
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
@@ -84,10 +82,10 @@ service.interceptors.response.use(
   },
   error => {
     // console.log('err' + error)// for debug
-    // console.log(error.response.data.msg) 
+    // console.log(error.response.data.msg)
     Message({
       message: error.message,
-      //message: error.response.data.msg,
+      // message: error.response.data.msg,
       type: 'error',
       duration: 8 * 1000
     })

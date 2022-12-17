@@ -1,18 +1,18 @@
 <template>
-  <div> 
+  <div>
     <el-row v-for="(item,index) in labels" :key="index">
-        <el-col :span="9">
-          <el-input v-model="labels[index].key" :disabled="item.key === 'project'" @input="changeEvent"/>
-        </el-col>
-        <el-col :span="9">
-          <el-input v-model="labels[index].value" :disabled="item.key === 'project'" style="margin-left: 10px;" @input="changeEvent"/>
-        </el-col>
-        <el-col :span="6">
-          <el-button-group >
-          <el-button type="text" icon="el-icon-document-add" v-show="labels.length - 1 == index" :disabled=addButtonState circle size="medium" @click="addLabel(labels)" >Add</el-button>
-          <el-button type="text" icon="el-icon-delete" circle size="medium" @click="delLabel(index, labels)" :disabled="item.key === 'project'">Delete</el-button>
+      <el-col :span="9">
+        <el-input v-model="labels[index].key" :disabled="item.key === 'project'" @input="changeEvent" />
+      </el-col>
+      <el-col :span="9">
+        <el-input v-model="labels[index].value" :disabled="item.key === 'project'" style="margin-left: 10px;" @input="changeEvent" />
+      </el-col>
+      <el-col :span="6">
+        <el-button-group>
+          <el-button v-show="labels.length - 1 == index" type="text" icon="el-icon-document-add" :disabled="addButtonState" circle size="medium" @click="addLabel(labels)">Add</el-button>
+          <el-button type="text" icon="el-icon-delete" circle size="medium" :disabled="item.key === 'project'" @click="delLabel(index, labels)">Delete</el-button>
         </el-button-group>
-          <!-- <svg @click="addLabel(labels)" viewBox="0 0 24 24" width="32" height="32" v-show="labels.length - 1 == index">
+        <!-- <svg @click="addLabel(labels)" viewBox="0 0 24 24" width="32" height="32" v-show="labels.length - 1 == index">
           <path fill="none" d="M0 0h24v24H0z" />
             <path
               fill="green"
@@ -28,7 +28,7 @@
         </svg> -->
       </el-col>
     </el-row>
-</div>
+  </div>
 
 </template>
 
@@ -36,9 +36,9 @@
 
 export default {
   name: 'Lables',
-  model:{
-    prop: "items",
-    event: "change"
+  model: {
+    prop: 'items',
+    event: 'change'
   },
   props: {
     items: {
@@ -46,56 +46,56 @@ export default {
       required: true
     }
   },
-  data(){
+  data() {
     return {
       disableAddButton: true
     }
   },
-  computed:{
-    labels:{
-      get(){        
-        var _labels=[]
-        for (var key in this.items){
-          if (key === "project"){
-            _labels = [{key: key, value: this.items[key]}].concat(_labels)
+  computed: {
+    labels: {
+      get() {
+        var _labels = []
+        for (var key in this.items) {
+          if (key === 'project') {
+            _labels = [{ key: key, value: this.items[key] }].concat(_labels)
             continue
           }
-          _labels.push({key: key, value: this.items[key]})
+          _labels.push({ key: key, value: this.items[key] })
         }
         return _labels
       }
     },
-    addButtonState:{
-      get(){
-        return (this.labels[this.labels.length -1].key === "" || this.labels[this.labels.length -1].value === "")
+    addButtonState: {
+      get() {
+        return (this.labels[this.labels.length - 1].key === '' || this.labels[this.labels.length - 1].value === '')
       }
     }
   },
   methods: {
-    changeEvent(event){
-      var d={}
+    changeEvent(event) {
+      var d = {}
       this.labels.forEach(element => {
-        d[element["key"]]=element["value"]
-      });
-      this.$emit("change", d)
+        d[element['key']] = element['value']
+      })
+      this.$emit('change', d)
     },
-    addLabel(items){      
-      if (items[items.length -1].key !== ""){
-        items.push({key:"",value:""})
+    addLabel(items) {
+      if (items[items.length - 1].key !== '') {
+        items.push({ key: '', value: '' })
         this.changeEvent()
       }
     },
-    delLabel(index,items){
-      if (items.length === 1 && items[0].key !== "" && items[0].value !== ""){
+    delLabel(index, items) {
+      if (items.length === 1 && items[0].key !== '' && items[0].value !== '') {
         items.splice(index, 1)
-        items.push({key:"",value:""})
+        items.push({ key: '', value: '' })
         this.changeEvent()
       }
-      if (items.length > 1){
+      if (items.length > 1) {
         items.splice(index, 1)
         this.changeEvent()
       }
-    },
+    }
   }
 
 }

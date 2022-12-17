@@ -3,7 +3,7 @@
     <el-row style="margin-bottom: 20px;">
       <el-button @click="AddContactGroup">
         Add ContactGroup
-    </el-button>
+      </el-button>
     </el-row>
     <!-- Table -->
     <el-table
@@ -21,7 +21,7 @@
       </el-table-column>
       <el-table-column label="Projects" align="center">
         <template slot-scope="scope">
-            {{ scope.row.spec.projects }}
+          {{ scope.row.spec.projects }}
         </template>
       </el-table-column>
       <el-table-column label="Members" align="center">
@@ -30,16 +30,16 @@
             {{ v }}
           </p> -->
           <div style="vertical-align: sub;">
-
-          <el-tag
-            v-for="v in scope.row.spec.members"
-            size="medium"
-            style="float: left;margin: 5px 5px 5px 5px;"
-            effect="plain"
-          >
-          {{ v }}
-          </el-tag>
-        </div>
+            <el-tag
+              v-for="member,key in scope.row.spec.members"
+              :key="key"
+              size="medium"
+              style="float: left;margin: 5px 5px 5px 5px;"
+              effect="plain"
+            >
+              {{ member }}
+            </el-tag>
+          </div>
         </template>
       </el-table-column>
 
@@ -55,30 +55,15 @@
           <el-button type="text" icon="el-icon-edit-outline" circle size="mini" @click="editContactGroup(scope.row)">EDIT</el-button>
           <el-button type="text" icon="el-icon-delete" circle size="mini" @click="delContactGroup(scope.row)">DELETE</el-button>
         </template>
-        
+
       </el-table-column>
     </el-table>
-    <!-- FORM -->
-    <!-- <el-drawer
-      title="Add Contact Group"
-      :visible.sync="showDrawer"
-      v-if="showDrawer"
-      direction="rtl"
-      :modal="true"
-      :show-close="true"
-      :wrapperClosable="false"
-      size="30%"
-      :before-close="closeHander"
-      :destroy-on-close="true"
-    >
-      <ContactGroupFrom1></ContactGroupFrom1>
-    </el-drawer> -->
-    <ContactGroupFrom :isActive.sync="formShow" :formData="formItems" :isEdit="formEdit" :callBack="fetchData"></ContactGroupFrom>
+    <ContactGroupFrom :is-active.sync="formShow" :form-data="formItems" :is-edit="formEdit" :call-back="fetchData" />
   </div>
 </template>
 
 <script>
-import { ListContactGroup, CreateContactGroup, DeleteContactGroup } from '@/api/ContactGroup'
+import { ListContactGroup, DeleteContactGroup } from '@/api/ContactGroup'
 import ContactGroupFrom from './from'
 
 export default {
@@ -92,6 +77,9 @@ export default {
       return statusMap[status]
     }
   },
+  components: {
+    ContactGroupFrom
+  },
   data() {
     return {
       centerDialogVisible: false,
@@ -103,32 +91,29 @@ export default {
       formShow: false,
       formEdit: false,
       contactGroupItem: {
-        "kind": "ContactGroup",
-        "apiVersion": "pronoea.io/v1",
-        "metadata": {
-            "name": "",
-            "labels": {}
+        'kind': 'ContactGroup',
+        'apiVersion': 'pronoea.io/v1',
+        'metadata': {
+          'name': '',
+          'labels': {}
         },
-        "spec": {
-          "members": [""],
-          "projects": ""
-        },
+        'spec': {
+          'members': [''],
+          'projects': ''
+        }
+      }
+    }
+  },
+  watch: {
+    showDrawer: {
+      handler: function(val, oldval) {
+        console.log('showDrawer: ' + val)
       },
+      immediate: true
     }
   },
   created() {
     this.fetchData()
-  },
-  watch:{
-    showDrawer: {
-      handler: function(val, oldval){
-        console.log("showDrawer: " + val)
-      },
-      immediate: true
-    },
-  },
-  components:{
-    ContactGroupFrom
   },
   methods: {
     fetchData() {
@@ -136,23 +121,23 @@ export default {
       ListContactGroup().then(response => {
         this.items = response.items
         this.listLoading = false
-      }).catch(err=>{
+      }).catch(err => {
         console.log(err)
       })
     },
-    delContactGroup(row){
+    delContactGroup(row) {
       DeleteContactGroup(row.metadata.name).then(res => {
         this.items.splice(row.$index, 1)
-      }).catch(err=>{
+      }).catch(err => {
         console.log(err)
       })
     },
-    editContactGroup(row){
+    editContactGroup(row) {
       this.formItems = row
       this.formShow = true
       this.formEdit = true
     },
-    AddContactGroup(){
+    AddContactGroup() {
       this.formItems = this.contactGroupItem
       this.formShow = true
       this.formEdit = false

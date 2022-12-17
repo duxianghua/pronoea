@@ -11,7 +11,7 @@ export function ListContactGroup(params) {
 export function GetContactGroup(namespace, name) {
   return request({
     url: '/api/v1/contactgroup/' + name,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -34,7 +34,7 @@ export function UpdateContactGroup(data) {
 export function DeleteContactGroup(name) {
   return request({
     url: '/api/v1/contactgroup/' + name,
-    method: 'delete',
+    method: 'delete'
   })
 }
 

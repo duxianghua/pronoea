@@ -9,9 +9,9 @@ const mutations = {
       state[key] = value
     }
   },
-  ChangeShowDrawer(){
+  ChangeShowDrawer() {
     state.showDrawer = !state.showDrawer
-  },
+  }
 }
 
 export default {
