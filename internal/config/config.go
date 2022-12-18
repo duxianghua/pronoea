@@ -1,14 +1,35 @@
 package config
 
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
+)
+
 // Conf is to store our service configuration
 
 var (
-	Cfg Confing
+	Cfg *Confing
 )
+
+func init() {
+	if Cfg == nil {
+		Cfg = &Confing{
+			Database: DBConfig{
+				Host: "127.0.0.1",
+			},
+		}
+		fmt.Println(Cfg.Test.Host)
+	}
+}
 
 type Confing struct {
 	Database DBConfig    `yaml:"database"`
 	Email    EmailConfig `yaml:"email"`
+	Test     TEST
 }
 
 type DBConfig struct {
@@ -17,6 +38,11 @@ type DBConfig struct {
 	Username string `yaml:"username" env:"DB_USERNAME"`
 	Password string `yaml:"password" env:"DB_PASSWORD"`
 	Database string `yaml:"database" env:"DB_DATABASE"`
+}
+
+type TEST struct {
+	Host string `yaml:"host,default" env:"DATABASE_HOST"`
+	Port string `yaml:"port" env:"DB_PORT"`
 }
 
 type EmailConfig struct {
@@ -42,17 +68,29 @@ type EmailConfig struct {
 // 	return &conf, nil
 // }
 
-// func InitConfig(path string) (*Confing, error) {
-// 	var cfg Confing
-// 	var err error
-// 	if len(path) > 0 {
-// 		err = cleanenv.ReadConfig(path, &cfg)
-// 	} else {
-// 		err = cleanenv.ReadEnv(&cfg)
-// 	}
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	CFG = &cfg
-// 	return &cfg, nil
-// }
+func InitConfig(path string) error {
+	v := viper.New()
+
+	if len(path) > 0 {
+		v.SetConfigFile(path)
+		err := v.ReadInConfig()
+		if err != nil { // Handle errors reading the config file
+			panic(fmt.Errorf("ncounter an error in loading configuration file: %w", err))
+		}
+	}
+	v.BindEnv("test.host")
+	v.SetEnvPrefix("WM")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
+
+	fmt.Println(v.GetString("DATABASE_HOST"))
+	if err := v.Unmarshal(&Cfg); err != nil {
+		log.Error().Msg(err.Error())
+		os.Exit(1)
+	}
+	fmt.Println(Cfg.Database.Host)
+
+	fmt.Println(Cfg.Database.Host)
+	fmt.Println(Cfg.Test.Host)
+	return nil
+}

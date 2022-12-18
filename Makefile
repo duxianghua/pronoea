@@ -34,7 +34,7 @@ ENVTEST ?= $(LOCALBIN)/setup-envtest
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v3.8.7
-CONTROLLER_TOOLS_VERSION ?= v0.9.2
+CONTROLLER_TOOLS_VERSION ?= v0.10.0
 
 
 version:
@@ -48,7 +48,7 @@ init:
 
 build: image-build
 
-run: generate manifests
+run: generate manifests apply-manifests
 	go run cmd/main.go --debug
 
 stop: container-stop
@@ -85,6 +85,11 @@ generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and
 .PHONY: manifests
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./internal/api/..." output:crd:artifacts:config=manifests/crd output:rbac:artifacts:config=manifests/rbac
+
+apply-manifests:
+	kubectl apply -f manifests/crd
+
+
 
 load-image: image-build
 	kind kind load docker-image $(DOCKER_IMAGE_NAME)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -41,11 +40,12 @@ func main() {
 	// viper.SetConfigName("config")
 	// viper.SetConfigType("yaml")
 	// viper.AddConfigPath(".")
-	viper.SetConfigFile(viper.GetString("config"))
-	err := viper.ReadInConfig()
-	if err != nil { // Handle errors reading the config file
-		panic(fmt.Errorf("ncounter an error in loading configuration file: %w", err))
-	}
+
+	// viper.SetConfigFile(viper.GetString("config"))
+	// err := viper.ReadInConfig()
+	// if err != nil { // Handle errors reading the config file
+	// 	panic(fmt.Errorf("ncounter an error in loading configuration file: %w", err))
+	// }
 	viper.SetEnvPrefix("WM")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

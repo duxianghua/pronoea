@@ -45,14 +45,6 @@ func StartMgr() {
 		os.Exit(1)
 	}
 
-	// if err = (&ContactGroupReconciler{
-	// 	Client: mgr.GetClient(),
-	// 	Scheme: mgr.GetScheme(),
-	// }).SetupWithManager(mgr); err != nil {
-	// 	setupLog.Error(err, "unable to create controller", "controller", "ContactGroup")
-	// 	os.Exit(1)
-	// }
-
 	go func() {
 		if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 			setupLog.Error(err, "problem running manager")

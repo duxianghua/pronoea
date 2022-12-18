@@ -101,6 +101,7 @@ func (p *ScenariosAPI) Delete(c *gin.Context) {
 		c.Error(err).SetType(gin.ErrorTypeBind)
 		return
 	}
+
 	c.JSON(200, gin.H{})
 }
 
@@ -115,6 +116,7 @@ func (p *ScenariosAPI) Update(c *gin.Context) {
 	}
 
 	configmap.ObjectMeta.Name = name
+	fmt.Println(configmap)
 	err = controllers.Probe.Update(c.Request.Context(), &configmap, &client.UpdateOptions{})
 	if errors.IsNotFound(err) {
 		c.Status(404)
@@ -158,49 +160,55 @@ func (p *ScenariosAPI) Status(c *gin.Context) {
 }
 
 func (p *ScenariosAPI) Patch(c *gin.Context) {
+	var err error
 	configmap := coreV1.ConfigMap{}
-	k6deployment := appsV1.Deployment{}
 	name := c.Param("name")
 	namespace, ok := c.GetQuery("namespace")
 	if !ok {
 		namespace = utils.GetCurrentNamespace()
 	}
-	err := controllers.Probe.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, &configmap)
+	err = controllers.Probe.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, &configmap)
 	if errors.IsNotFound(err) {
 		c.JSON(404, err)
+		return
 	} else if err != nil {
 		c.Error(err).SetType(gin.ErrorTypeBind)
 		return
 	}
+
 	enabled, ok := c.GetQuery("enabled")
 	if ok {
+		k6deployment := generateDeploymentObj(&configmap)
+		if configmap.Annotations["pronoea.io/enabled"] == enabled {
+			c.JSON(200, gin.H{})
+			return
+		}
 		switch enabled {
 		case "true":
-			fmt.Println("true")
-			if configmap.Annotations["pronoea.io/enabled"] == "true" {
-				c.JSON(200, gin.H{})
-				return
-			}
-			err := createOrUpdateK6Deployment(&configmap)
-			if errors.IsNotFound(err) {
-				c.JSON(404, err)
-			} else if err != nil {
-				c.Error(err).SetType(gin.ErrorTypeBind)
+			err = controllers.Probe.Create(context.TODO(), k6deployment, &client.CreateOptions{})
+			if !errors.IsAlreadyExists(err) {
+				c.JSON(500, err)
 				return
 			}
 		case "false":
-			err := controllers.Probe.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, &k6deployment)
-			if errors.IsNotFound(err) {
-				c.JSON(404, err)
-			} else if err != nil {
-				c.Error(err).SetType(gin.ErrorTypeBind)
+			err = controllers.Probe.Delete(context.TODO(), k6deployment, &client.DeleteOptions{})
+			if !errors.IsNotFound(err) {
+				c.JSON(500, err)
 				return
 			}
-			controllers.Probe.Delete(context.TODO(), &k6deployment, &client.DeleteOptions{})
 		default:
 			c.JSON(200, gin.H{})
 			return
 		}
+		if configmap.Annotations == nil {
+			configmap.Annotations = map[string]string{}
+		}
+		configmap.Annotations["pronoea.io/enabled"] = enabled
+		err := controllers.Probe.Update(context.TODO(), &configmap)
+		if err != nil {
+			c.JSON(500, configmap)
+		}
+		return
 	}
 	data := c.Request.URL.Query()
 	c.JSON(200, data)
@@ -214,6 +222,74 @@ func contains(s []string, str string) bool {
 	}
 
 	return false
+}
+
+func generateDeploymentObj(scenarios *coreV1.ConfigMap) *appsV1.Deployment {
+	blockOwnerDelete := true
+	deployment := appsV1.Deployment{
+		ObjectMeta: metaV1.ObjectMeta{
+			Name:      scenarios.Name,
+			Namespace: scenarios.Namespace,
+			OwnerReferences: []metaV1.OwnerReference{
+				{
+					APIVersion:         scenarios.APIVersion,
+					Kind:               scenarios.Kind,
+					Name:               scenarios.Name,
+					UID:                scenarios.UID,
+					BlockOwnerDeletion: &blockOwnerDelete,
+				},
+			},
+			Labels: scenarios.Labels,
+		},
+		Spec: appsV1.DeploymentSpec{
+			Selector: &metaV1.LabelSelector{MatchLabels: scenarios.Labels},
+			Template: coreV1.PodTemplateSpec{
+				ObjectMeta: metaV1.ObjectMeta{
+					Labels: scenarios.Labels,
+				},
+				Spec: coreV1.PodSpec{
+					Containers: []coreV1.Container{
+						{
+							Name:  "k6",
+							Image: "xingba/k6:output-prometheus-betav0.0.2",
+							Ports: []coreV1.ContainerPort{
+								{
+									Name:          "http",
+									ContainerPort: int32(9115),
+									Protocol:      coreV1.ProtocolTCP,
+								},
+							},
+							Env: []coreV1.EnvVar{
+								{
+									Name:  "K6_PROMETHEUS_RW_SERVER_URL",
+									Value: "http://prometheus-operated:9090/api/v1/write",
+								},
+							},
+							VolumeMounts: []coreV1.VolumeMount{
+								{
+									Name:      "k6-scripts",
+									MountPath: "/test",
+								},
+							},
+						},
+					},
+					Volumes: []coreV1.Volume{
+						{
+							Name: "k6-scripts",
+							VolumeSource: coreV1.VolumeSource{
+								ConfigMap: &coreV1.ConfigMapVolumeSource{
+									LocalObjectReference: coreV1.LocalObjectReference{
+										Name: scenarios.Name,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	return &deployment
 }
 
 func createOrUpdateK6Deployment(scenarios *coreV1.ConfigMap) (err error) {

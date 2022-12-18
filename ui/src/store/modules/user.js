@@ -3,7 +3,6 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
-  console.log('getDefaultState')
   return {
     token: getToken(),
     name: '',
