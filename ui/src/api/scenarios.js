@@ -40,10 +40,18 @@ export function DeleteScenarios(name, params) {
   })
 }
 
-export function statusScenarios(name, params) {
+export function StatusScenarios(name, params) {
   return request({
     url: '/api/v1/scenarios/' + name + '/status',
     method: 'get',
+    params
+  })
+}
+
+export function PatchScenarios(name, params) {
+  return request({
+    url: '/api/v1/scenarios/' + name,
+    method: 'patch',
     params
   })
 }

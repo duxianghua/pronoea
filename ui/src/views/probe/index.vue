@@ -4,6 +4,7 @@
       <el-row :gutter="20">
         <el-col :span="8">
           <el-input
+            v-model="search"
             placeholder="Search"
             prefix-icon="el-icon-search"
           />
@@ -14,14 +15,13 @@
             Add Probe
           </el-button>
         </el-col>
-
       </el-row>
     </div>
     <!-- Table -->
     <el-table
       :key="listKey"
       v-loading="listLoading"
-      :data="list"
+      :data="list.filter(data => !search || data.metadata.name.toLowerCase().includes(search.toLowerCase()))"
       element-loading-text="Loading"
       border
       fit
@@ -55,7 +55,7 @@
       <el-table-column label="Monitoring" width="110" align="center">
         <template slot-scope="scope">
           <el-switch
-            v-model="scope.row.spec.pause "
+            v-model="scope.row.spec.pause"
             active-color="#13ce66"
             inactive-color="#ff4949"
             @change="pauseSwitch(scope)"
@@ -129,10 +129,11 @@ export default {
       showDrawer: false,
       centerDialogVisible: false,
       statusContext: {},
-      list: null,
+      list: [],
       listKey: Math.random(),
       listLoading: true,
-      loading: true
+      loading: true,
+      search: ''
     }
   },
   computed: {

@@ -22,14 +22,12 @@ func init() {
 				Host: "127.0.0.1",
 			},
 		}
-		fmt.Println(Cfg.Test.Host)
 	}
 }
 
 type Confing struct {
 	Database DBConfig    `yaml:"database"`
 	Email    EmailConfig `yaml:"email"`
-	Test     TEST
 }
 
 type DBConfig struct {
@@ -40,9 +38,8 @@ type DBConfig struct {
 	Database string `yaml:"database" env:"DB_DATABASE"`
 }
 
-type TEST struct {
-	Host string `yaml:"host,default" env:"DATABASE_HOST"`
-	Port string `yaml:"port" env:"DB_PORT"`
+type Scenarios struct {
+	PrometheusRemoteWriteRul string `yaml:"k6_prometheus_remote_write_url" env:"K6_PROMETHEUS_RW_SERVER_URL"`
 }
 
 type EmailConfig struct {
@@ -83,14 +80,9 @@ func InitConfig(path string) error {
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.AutomaticEnv()
 
-	fmt.Println(v.GetString("DATABASE_HOST"))
 	if err := v.Unmarshal(&Cfg); err != nil {
 		log.Error().Msg(err.Error())
 		os.Exit(1)
 	}
-	fmt.Println(Cfg.Database.Host)
-
-	fmt.Println(Cfg.Database.Host)
-	fmt.Println(Cfg.Test.Host)
 	return nil
 }

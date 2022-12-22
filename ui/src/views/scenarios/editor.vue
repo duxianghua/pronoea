@@ -76,14 +76,14 @@
             label-position="top" 
             hide-required-asterisk
           >
-            <el-form-item label="Name" prop="metadata.name">
-              <el-input v-model="obj.metadata.name"/>
+            <el-form-item label="Name" prop="metadata.name" >
+              <el-input v-model="obj.metadata.name" :disabled="this.viewInfo.name?true:false"/>
             </el-form-item>
-            <el-form-item label="Interval" prop="metadata.labels.interval">
-              <el-input v-model="obj.metadata.labels.interval"/>
+            <el-form-item label="Interval" prop="data.interval" name="asdf">
+              <el-input v-model="obj.data.interval" @change="onChange"/>
             </el-form-item>
             <el-form-item label="ContactGroup" prop="metadata.labels.project">
-            <el-select v-model="obj.metadata.labels.project" filterable placeholder="Please select">
+            <el-select v-model="obj.metadata.labels.project" filterable placeholder="Please select"  @change="onChange">
               <el-option
                 v-for="item in contactOptions"
                 :key="item"
@@ -118,8 +118,8 @@ export default {
         'metadata.labels.project': [
           { required: true, message: 'please select project', trigger: 'change' }
         ],
-        'metadata.labels.interval': [
-          { required: true, type: "integer", min: 10,  message: 'please enter integer interval > 10', trigger: ['blur', 'change'], transform(value) {return Number(value)} },
+        'data.interval': [
+          { name: "asfdd", required: true, type: "integer", min: 10, trigger: ['blur', 'change'], transform(value) {return Number(value)} },
         ]
       },
       saveDisabled: true,
@@ -192,9 +192,9 @@ export default function () {
           this.obj = response
           this.code = String(response.data["test.js"])
           this.loading = false
+          
         }).catch(err => {
           console.log(err)
-          //this.code = this.codeTemp
           this.loading = false
         })
       }else{
