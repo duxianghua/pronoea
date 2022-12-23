@@ -32,7 +32,7 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     proxy:{
-      '^/dev-api/api':{
+      '^/api/v1':{
         target: 'http://127.0.0.1:8081',
         changeOrigin: true,
         onProxyReq: (proxyReq, req, res, options) => {
@@ -45,9 +45,9 @@ module.exports = {
             }
           }
         },
-        pathRewrite: {
-          '^/dev-api':''
-        }
+        // pathRewrite: {
+        //   '^/dev-api':''
+        // }
       }
     },
     port: port,

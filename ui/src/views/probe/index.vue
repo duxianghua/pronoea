@@ -43,7 +43,7 @@
       <el-table-column label="Targets" align="center">
         <template slot-scope="scope">
           <div v-for="target,key in scope.row.spec.targets" :key="key">
-            <el-link type="primary" :href="v" target="_blank">{{ target }}</el-link>
+            <el-link type="primary" :href="target" target="_blank">{{ target }}</el-link>
           </div>
         </template>
       </el-table-column>

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getList(params) {
   return request({
-    url: '/api/v1/probe/',
+    url: '/probe/',
     method: 'get',
     params
   })
@@ -10,7 +10,7 @@ export function getList(params) {
 
 export function CreateProbe(data) {
   return request({
-    url: '/api/v1/probe/' + data.metadata.name,
+    url: '/probe/' + data.metadata.name,
     method: 'post',
     data
   })
@@ -18,7 +18,7 @@ export function CreateProbe(data) {
 
 export function UpdateProbe(data) {
   return request({
-    url: '/api/v1/probe/' + data.metadata.name,
+    url: '/probe/' + data.metadata.name,
     method: 'put',
     data
   })
@@ -26,7 +26,7 @@ export function UpdateProbe(data) {
 
 export function deleteProbe(name, params) {
   return request({
-    url: '/api/v1/probe/' + name,
+    url: '/probe/' + name,
     method: 'delete',
     params
   })
@@ -34,7 +34,7 @@ export function deleteProbe(name, params) {
 
 export function statusProbe(name, params) {
   return request({
-    url: '/api/v1/probe/' + name + '/status',
+    url: '/probe/' + name + '/status',
     method: 'get',
     params
   })

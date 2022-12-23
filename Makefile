@@ -92,4 +92,4 @@ apply-manifests:
 
 
 load-image: image-build
-	kind kind load docker-image $(DOCKER_IMAGE_NAME)
+	kind load docker-image $(DOCKER_IMAGE_NAME)

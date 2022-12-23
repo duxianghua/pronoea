@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function ListScenarios(params) {
   return request({
-    url: '/api/v1/scenarios/',
+    url: '/scenarios/',
     method: 'get',
     params
   })
@@ -10,7 +10,7 @@ export function ListScenarios(params) {
 
 export function GetScenarios(namespace, name) {
   return request({
-    url: '/api/v1/scenarios/' + name,
+    url: '/scenarios/' + name,
     method: 'get',
     params: {namespace: namespace}
   })
@@ -18,7 +18,7 @@ export function GetScenarios(namespace, name) {
 
 export function CreateScenarios(data) {
   return request({
-    url: '/api/v1/scenarios/' + data.metadata.name,
+    url: '/scenarios/' + data.metadata.name,
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export function CreateScenarios(data) {
 
 export function UpdateScenarios(data) {
   return request({
-    url: '/api/v1/scenarios/' + data.metadata.name,
+    url: '/scenarios/' + data.metadata.name,
     method: 'put',
     data
   })
@@ -34,7 +34,7 @@ export function UpdateScenarios(data) {
 
 export function DeleteScenarios(name, params) {
   return request({
-    url: '/api/v1/scenarios/' + name,
+    url: '/scenarios/' + name,
     method: 'delete',
     params
   })
@@ -42,7 +42,7 @@ export function DeleteScenarios(name, params) {
 
 export function StatusScenarios(name, params) {
   return request({
-    url: '/api/v1/scenarios/' + name + '/status',
+    url: '/scenarios/' + name + '/status',
     method: 'get',
     params
   })
@@ -50,7 +50,7 @@ export function StatusScenarios(name, params) {
 
 export function PatchScenarios(name, params) {
   return request({
-    url: '/api/v1/scenarios/' + name,
+    url: '/scenarios/' + name,
     method: 'patch',
     params
   })

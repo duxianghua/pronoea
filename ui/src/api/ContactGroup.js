@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function ListContactGroup(params) {
   return request({
-    url: '/api/v1/contactgroup/',
+    url: '/contactgroup/',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function ListContactGroup(params) {
 
 export function GetContactGroup(namespace, name) {
   return request({
-    url: '/api/v1/contactgroup/' + name,
+    url: '/contactgroup/' + name,
     method: 'get'
   })
 }
 
 export function CreateContactGroup(data) {
   return request({
-    url: '/api/v1/contactgroup/' + data.metadata.name,
+    url: '/contactgroup/' + data.metadata.name,
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function CreateContactGroup(data) {
 
 export function UpdateContactGroup(data) {
   return request({
-    url: '/api/v1/contactgroup/' + data.metadata.name,
+    url: '/contactgroup/' + data.metadata.name,
     method: 'put',
     data
   })
@@ -33,7 +33,7 @@ export function UpdateContactGroup(data) {
 
 export function DeleteContactGroup(name) {
   return request({
-    url: '/api/v1/contactgroup/' + name,
+    url: '/contactgroup/' + name,
     method: 'delete'
   })
 }

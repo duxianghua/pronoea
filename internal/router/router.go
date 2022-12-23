@@ -9,10 +9,17 @@ func Register(r *gin.Engine) {
 	// Unified exception handling
 	r.Use(handler.Recover)
 	r.Use(handler.ErrorHandler)
-	r.Static("/dashboard", "./html/")
-	r.Static("/favicon.ico", "./html/")
+	// r.Static("/index", "./html/")
+	//r.StaticFile("/favicon.ico", "./html/favicon.ico")
 	r.Static("/static", "./html/static")
-	r.GET("/", handler.RedirectHomeHandler)
+	//r.StaticFS("/static", http.Dir("./html"))
+	//r.GET("/", handler.RedirectHomeHandler)
+	// r.GET("/", func(ctx *gin.Context) {
+	// 	ctx.Redirect(302, "/static/")
+	// })
+	r.NoRoute(func(ctx *gin.Context) {
+		ctx.File("./html/index.html")
+	})
 	// r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	// health apis
