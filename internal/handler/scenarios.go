@@ -54,7 +54,7 @@ func (p *ScenariosAPI) List(c *gin.Context) {
 	}
 	// 请求prometheus
 	client, err := api.NewClient(api.Config{
-		Address: "http://localhost:52314/",
+		Address: "http://prometheus-operated:9090/",
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -206,7 +206,7 @@ func (p *ScenariosAPI) Status(c *gin.Context) {
 	}
 
 	client, err := api.NewClient(api.Config{
-		Address: "http://localhost:52314/",
+		Address: "http://prometheus-operated:9090/",
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
