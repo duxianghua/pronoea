@@ -22,6 +22,7 @@ WORKDIR /app
 COPY --from=builder /builder/bin/pronoea .
 COPY --from=nodebuilder /builder/dist/ ./html/
 COPY ./internal/config/config.yaml ./
+COPY ./email-templates ./templates
 
 EXPOSE 8080
 
