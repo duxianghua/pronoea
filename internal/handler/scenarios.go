@@ -295,7 +295,6 @@ func generateDeploymentObj(scenarios *coreV1.ConfigMap) *appsV1.Deployment {
 	if prometheus_remote_write == "" {
 		prometheus_remote_write = fmt.Sprintf("%s/api/v1/write", config.Options.Scenarios.PrometheusURL)
 	}
-
 	blockOwnerDelete := true
 	deployment := appsV1.Deployment{
 		ObjectMeta: metaV1.ObjectMeta{
@@ -375,6 +374,11 @@ func generateDeploymentObj(scenarios *coreV1.ConfigMap) *appsV1.Deployment {
 				},
 			},
 		},
+	}
+
+	//注入scenarios labels到metrics labels
+	for k, v := range scenarios.ObjectMeta.Labels {
+		deployment.Spec.Template.Spec.Containers[0].Args = append(deployment.Spec.Template.Spec.Containers[0].Args, fmt.Sprintf("--tag %s=%s", k, v))
 	}
 	return &deployment
 }

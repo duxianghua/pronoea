@@ -44,7 +44,7 @@ func main() {
 	if err != nil { // Handle errors reading the config file
 		panic(fmt.Errorf("ncounter an error in loading configuration file: %w", err))
 	}
-	viper.SetEnvPrefix("WM")
+	viper.SetEnvPrefix("PR")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
