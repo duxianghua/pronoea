@@ -35,13 +35,23 @@
             element-loading-text="Loading"
             v-loading="checksLoading"
             :cell-class-name="checksClass"
-            :show-header="false"
             class="test123"
           >
           <el-table-column width="3"></el-table-column>
             <el-table-column label="Name">
               <template slot-scope="scope">
                 {{ scope.row.metric.check }}
+              </template>
+            </el-table-column>
+            <el-table-column label="Group">
+              <template slot-scope="scope">
+                {{ scope.row.metric.group }}
+              </template>
+            </el-table-column>
+            <el-table-column label="State">
+              <template slot-scope="scope">
+                <i class="el-icon-close" style="color: red;" v-if="scope.row.value[1]==='0'"></i>
+                <i class="el-icon-check" style="color: green;" v-if="scope.row.value[1]==='1'"></i>
               </template>
             </el-table-column>
         </el-table>
@@ -194,7 +204,7 @@ export default {
       if (!row.checks){
         row.checks = []
         this.checksLoading=true
-          StatusScenarios(row.metadata.name).then(response=>{
+          StatusScenarios(row.metadata.name, {namespace: row.metadata.namespace}).then(response=>{
             row.checks = response
             this.checksLoading=false
           }).catch(err => {
@@ -244,7 +254,7 @@ export default {
       this.fetchData()
     },
     pausedSwitch(scope) {
-      PatchScenarios(scope.row.metadata.name, {"paused": scope.row.status.paused}).then(response => {
+      PatchScenarios(scope.row.metadata.name, {"paused": scope.row.status.paused, namespace: scope.row.metadata.namespace}).then(response => {
         //this.$set(this.list, scope.$index, response)
       }).catch(err => {
         this.$message(err.$message)

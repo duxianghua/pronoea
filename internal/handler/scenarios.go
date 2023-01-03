@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
+	"github.com/duxianghua/pronoea/internal/config"
 	"github.com/duxianghua/pronoea/internal/controllers"
 	"github.com/duxianghua/pronoea/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -54,7 +54,7 @@ func (p *ScenariosAPI) List(c *gin.Context) {
 	}
 	// 请求prometheus
 	client, err := api.NewClient(api.Config{
-		Address: "http://prometheus-operated:9090/",
+		Address: config.Options.Scenarios.PrometheusURL,
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -206,7 +206,7 @@ func (p *ScenariosAPI) Status(c *gin.Context) {
 	}
 
 	client, err := api.NewClient(api.Config{
-		Address: "http://prometheus-operated:9090/",
+		Address: config.Options.Scenarios.PrometheusURL,
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -291,10 +291,11 @@ func contains(s []string, str string) bool {
 }
 
 func generateDeploymentObj(scenarios *coreV1.ConfigMap) *appsV1.Deployment {
-	prometheus_remote_write, ok := os.LookupEnv("K6_PROMETHEUS_RW_SERVER_URL")
-	if !ok {
-		prometheus_remote_write = "http://prometheus-operated.monitoring.svc.cluster.local:9090/api/v1/write"
+	prometheus_remote_write := config.Options.Scenarios.PrometheusRemoteWriteURL
+	if prometheus_remote_write == "" {
+		prometheus_remote_write = fmt.Sprintf("%s/api/v1/write", config.Options.Scenarios.PrometheusURL)
 	}
+
 	blockOwnerDelete := true
 	deployment := appsV1.Deployment{
 		ObjectMeta: metaV1.ObjectMeta{
@@ -321,8 +322,9 @@ func generateDeploymentObj(scenarios *coreV1.ConfigMap) *appsV1.Deployment {
 					Containers: []coreV1.Container{
 						{
 							Name:  "k6",
-							Image: "xingba/k6:output-prometheus-betav0.0.2",
+							Image: config.Options.Scenarios.K6image,
 							Args: []string{
+								"-o xk6-prometheus-rw",
 								fmt.Sprintf("--tag name=%s", scenarios.Name),
 								fmt.Sprintf("--tag uid=%s", scenarios.UID),
 							},

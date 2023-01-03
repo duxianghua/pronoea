@@ -16,19 +16,20 @@ export function GetScenarios(namespace, name) {
   })
 }
 
-export function CreateScenarios(data) {
+export function CreateScenarios(name, data) {
   return request({
-    url: '/scenarios/' + data.metadata.name,
+    url: '/scenarios/' + name,
     method: 'post',
     data
   })
 }
 
-export function UpdateScenarios(data) {
+export function UpdateScenarios(name, data, params) {
   return request({
-    url: '/scenarios/' + data.metadata.name,
+    url: '/scenarios/' + name,
     method: 'put',
-    data
+    data,
+    params: params,
   })
 }
 

@@ -12,22 +12,26 @@ import (
 // Conf is to store our service configuration
 
 var (
-	Cfg *Confing
+	Options *Confing
 )
 
 func init() {
-	if Cfg == nil {
-		Cfg = &Confing{
-			Database: DBConfig{
-				Host: "127.0.0.1",
+	if Options == nil {
+		Options = &Confing{
+			Database: DBConfig{},
+			Email:    EmailConfig{},
+			Scenarios: ScenarioConfig{
+				PrometheusURL: "http://prometheus-operated:9090",
+				K6image:       "xingba/k6:output-prometheus-betav0.0.5",
 			},
 		}
 	}
 }
 
 type Confing struct {
-	Database DBConfig    `yaml:"database"`
-	Email    EmailConfig `yaml:"email"`
+	Database  DBConfig       `yaml:"database"`
+	Email     EmailConfig    `yaml:"email"`
+	Scenarios ScenarioConfig `mapstructure:"scenarios"`
 }
 
 type DBConfig struct {
@@ -38,8 +42,10 @@ type DBConfig struct {
 	Database string `yaml:"database" env:"DB_DATABASE"`
 }
 
-type Scenarios struct {
-	PrometheusRemoteWriteRul string `yaml:"k6_prometheus_remote_write_url" env:"K6_PROMETHEUS_RW_SERVER_URL"`
+type ScenarioConfig struct {
+	PrometheusRemoteWriteURL string `mapstructure:"k6_prometheus_remote_write_url" env:"K6_PROMETHEUS_RW_SERVER_URL"`
+	PrometheusURL            string `mapstructure:"prometheus_url" env:"PROMETHEUS_URL"`
+	K6image                  string `mapstructure:"k6_image"`
 }
 
 type EmailConfig struct {
@@ -53,17 +59,6 @@ type EmailConfig struct {
 	Bcc      string   `yaml:"bcc" env:"EMAIL_BCC"`
 	Cc       []string `yaml:"cc" env:"EMAIL_CC"`
 }
-
-// // NewConf return new Conf instance from env
-// func NewConf() (*Confing, error) {
-// 	var conf Confing
-
-// 	err := cleanenv.ReadEnv(&conf)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &conf, nil
-// }
 
 func InitConfig(path string) error {
 	v := viper.New()
@@ -80,7 +75,7 @@ func InitConfig(path string) error {
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.AutomaticEnv()
 
-	if err := v.Unmarshal(&Cfg); err != nil {
+	if err := v.Unmarshal(&Options); err != nil {
 		log.Error().Msg(err.Error())
 		os.Exit(1)
 	}

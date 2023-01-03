@@ -58,7 +58,7 @@ func (aw *AlertmanagerWebhook) Post(c *gin.Context) {
 	}
 
 	body, err := tmpl.ExecuteHTMLString(
-		config.Cfg.Email.Html, message.Data)
+		config.Options.Email.Html, message.Data)
 	if err != nil {
 		result.Code = "500"
 		result.Msg = err.Error()
@@ -67,7 +67,7 @@ func (aw *AlertmanagerWebhook) Post(c *gin.Context) {
 		return
 	}
 	subject, err := tmpl.ExecuteHTMLString(
-		config.Cfg.Email.Subject, message.Data)
+		config.Options.Email.Subject, message.Data)
 
 	if err != nil {
 		result.Code = "500"
@@ -87,13 +87,12 @@ func SendEmail(subject string, body string, to ...string) {
 	from := m.FormatAddress("heimdallr@homepartners.tech", "DevOps Alerts")
 	m.SetHeader("From", from)
 	m.SetHeader("To", to...)
-	if len(strings.Split(config.Cfg.Email.Bcc, ",")) > 0 {
-		m.SetHeader("Bcc", strings.Split(config.Cfg.Email.Bcc, ",")...)
+	if len(strings.Split(config.Options.Email.Bcc, ",")) > 0 {
+		m.SetHeader("Bcc", strings.Split(config.Options.Email.Bcc, ",")...)
 	}
-	// m.SetAddressHeader("Bcc", xianghua.du@shareworks.cn", "Dan")
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
-	d := gomail.NewDialer(config.Cfg.Email.Host, config.Cfg.Email.Port, config.Cfg.Email.Username, config.Cfg.Email.Password)
+	d := gomail.NewDialer(config.Options.Email.Host, config.Options.Email.Port, config.Options.Email.Username, config.Options.Email.Password)
 	if err := d.DialAndSend(m); err != nil {
 		log.Error().Str("From", from).Strs("To", to).Msg(err.Error())
 		return

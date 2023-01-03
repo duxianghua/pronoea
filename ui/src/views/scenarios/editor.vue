@@ -207,13 +207,13 @@ export default function () {
         console.log(this.obj)
         if (valid) {
           if (this.obj.metadata.resourceVersion) {
-            UpdateScenarios(this.obj).then(response => {
+            UpdateScenarios(this.obj.metadata.name, this.obj, {"namespace": this.obj.metadata.namespace}).then(response => {
               this.saveDisabled = true
             }).catch(err => {
               console.log(err)
             })
           } else {
-            CreateScenarios(this.obj).then(response => {
+            CreateScenarios(this.obj.metadata.name, this.obj).then(response => {
               this.saveDisabled = true
             }).catch(err => {
               console.log(err)
